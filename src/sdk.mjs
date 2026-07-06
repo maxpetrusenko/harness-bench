@@ -1,6 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadHarnesses, loadSuite, loadTasks } from "./config.mjs";
+import { loadHarnesses, loadModels, loadSuite, loadTasks } from "./config.mjs";
 import { runMatrix } from "./runner.mjs";
 import { writeReport } from "./report.mjs";
 
@@ -17,7 +17,7 @@ export const runHarnessBench = async ({
   root = ROOT,
   suite = null,
   harnesses = null,
-  models = ["default"],
+  models = null,
   tasks = null,
   hardness = null,
   track = null,
@@ -30,6 +30,7 @@ export const runHarnessBench = async ({
   outDir = path.join(root, "runs", new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19)),
 } = {}) => {
   const allHarnesses = loadHarnesses(root);
+  const allModels = loadModels(root);
   let allTasks = loadTasks(root);
   let suiteConfig = null;
   if (suite) suiteConfig = loadSuite(root, suite);
@@ -46,7 +47,7 @@ export const runHarnessBench = async ({
     outDir,
     suite: suiteConfig?.id ?? suite,
     harnesses: pickById(allHarnesses, harnessIds, "harness"),
-    models: models ?? suiteConfig?.models ?? ["default"],
+    models: pickById(allModels, models ?? suiteConfig?.models ?? ["default"], "model"),
     tasks: allTasks,
     repeats: repeats ?? suiteConfig?.repeats ?? 1,
     context: context ?? suiteConfig?.context ?? "fresh",
@@ -60,4 +61,3 @@ export const runHarnessBench = async ({
   const reportPath = writeReport(outDir, results, config);
   return { outDir, reportPath, results };
 };
-

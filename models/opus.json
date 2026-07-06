@@ -1,0 +1,10 @@
+{
+  "id": "opus",
+  "label": "Claude Opus lane",
+  "provider": "anthropic",
+  "description": "Best-effort same Opus-family lane across CLIs. Exact vendor ids are recorded per run.",
+  "harnesses": {
+    "claude": "opus",
+    "droid": "claude-opus-4-5-20251101"
+  }
+}

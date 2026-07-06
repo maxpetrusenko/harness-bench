@@ -14,6 +14,18 @@ export const loadHarnesses = (root) => {
   });
 };
 
+export const loadModels = (root) => {
+  const dir = path.join(root, "models");
+  if (!fs.existsSync(dir)) return [];
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".json")).sort();
+  return files.map((file) => {
+    const model = JSON.parse(fs.readFileSync(path.join(dir, file), "utf8"));
+    if (!model.id) throw new Error(`Model config ${file} is missing "id"`);
+    model.harnesses = model.harnesses ?? {};
+    return model;
+  });
+};
+
 export const loadTasks = (root) => {
   const tracks = [
     { dir: path.join(root, "tasks"), track: "terminal" },
@@ -66,7 +78,27 @@ export const loadSuite = (root, suiteId) => {
   return JSON.parse(fs.readFileSync(suitePath, "utf8"));
 };
 
-export const resolveModelId = (harness, canonicalModel) => {
-  if (canonicalModel === "default") return harness.models?.default ?? null;
-  return harness.models?.[canonicalModel] ?? canonicalModel;
+export const resolveModelBinding = (harness, model) => {
+  if (harness.kind === "toy") {
+    return { compatible: true, model_id: null, reason: null };
+  }
+  if (model.id === "default") {
+    return { compatible: true, model_id: null, reason: null };
+  }
+
+  const mapping = model.harnesses?.[harness.id];
+  if (mapping === undefined || mapping === null || mapping === false) {
+    return {
+      compatible: false,
+      model_id: null,
+      reason: `model "${model.id}" has no mapping for harness "${harness.id}"`,
+    };
+  }
+  if (typeof mapping === "string") {
+    return { compatible: true, model_id: mapping, reason: null };
+  }
+  if (typeof mapping === "object" && mapping.id) {
+    return { compatible: true, model_id: mapping.id, reason: null };
+  }
+  throw new Error(`Invalid model mapping for ${model.id} × ${harness.id}`);
 };

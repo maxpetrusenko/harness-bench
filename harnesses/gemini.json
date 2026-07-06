@@ -4,9 +4,5 @@
   "parse": "gemini-json",
   "cwdMode": "workspace",
   "command": ["gemini", "--yolo", "-o", "json", "-p", "{prompt}"],
-  "modelArgs": ["-m", "{model}"],
-  "models": {
-    "default": null,
-    "gemini": "gemini-2.5-pro"
-  }
+  "modelArgs": ["-m", "{model}"]
 }

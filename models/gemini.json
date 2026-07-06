@@ -1,0 +1,9 @@
+{
+  "id": "gemini",
+  "label": "Gemini lane",
+  "provider": "google",
+  "description": "Gemini-family lane for Gemini CLI harness runs.",
+  "harnesses": {
+    "gemini": "gemini-2.5-pro"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "id": "default",
+  "label": "CLI default",
+  "provider": "harness",
+  "description": "Use each harness CLI default model by omitting model flags.",
+  "harnesses": {}
+}

@@ -4,10 +4,5 @@
   "parse": "droid-json",
   "cwdMode": "workspace",
   "command": ["droid", "exec", "-o", "json", "--auto", "medium", "--cwd", "{workspace}", "{prompt}"],
-  "modelArgs": ["-m", "{model}"],
-  "models": {
-    "default": null,
-    "sonnet": "claude-sonnet-4-5",
-    "opus": "claude-opus-4-5-20251101"
-  }
+  "modelArgs": ["-m", "{model}"]
 }

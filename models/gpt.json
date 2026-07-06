@@ -1,0 +1,11 @@
+{
+  "id": "gpt",
+  "label": "GPT lane",
+  "provider": "openai",
+  "description": "Best-effort same GPT-family lane across CLIs. Exact vendor ids are recorded per run.",
+  "harnesses": {
+    "codex": "gpt-5.3-codex",
+    "cursor-agent": "gpt-5",
+    "opencode": "openai/gpt-5"
+  }
+}

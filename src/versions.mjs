@@ -49,7 +49,13 @@ export const buildProvenance = (config) => ({
     version: resolveHarnessVersion(h),
     config_hash: hashFile(path.join(config.root, "harnesses", `${h.id}.json`)),
   })),
-  models: config.models,
+  models: config.models.map((model) => ({
+    id: model.id,
+    label: model.label ?? model.id,
+    provider: model.provider ?? null,
+    config_hash: hashFile(path.join(config.root, "models", `${model.id}.json`)),
+  })),
+  skipped_model_harnesses: config.skippedModelHarnesses ?? [],
   tasks: config.tasks.map((t) => ({
     id: t.id,
     hardness: t.hardness,

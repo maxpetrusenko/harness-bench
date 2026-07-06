@@ -4,11 +4,5 @@
   "parse": "claude-json",
   "cwdMode": "workspace",
   "command": ["claude", "-p", "--output-format", "json", "--dangerously-skip-permissions", "--no-session-persistence", "{prompt}"],
-  "modelArgs": ["--model", "{model}"],
-  "models": {
-    "default": null,
-    "sonnet": "sonnet",
-    "opus": "opus",
-    "haiku": "haiku"
-  }
+  "modelArgs": ["--model", "{model}"]
 }

@@ -1,4 +1,4 @@
-import { loadHarnesses, loadTasks, loadSuite, resolveModelId } from "./config.mjs";
+import { loadHarnesses, loadModels, loadTasks, loadSuite } from "./config.mjs";
 import { runMatrix } from "./runner.mjs";
 import { writeReport } from "./report.mjs";
 import { runCalibration } from "./calibrate.mjs";
@@ -23,7 +23,7 @@ Usage:
 Run options:
   --suite <id>            Use suites/<id>.json (prototype, harness-compare, hard, qa)
   --harnesses <a,b,c>     Harness ids
-  --models <a,b>          Canonical model names per harness
+  --models <a,b>          Model registry ids from models/*.json
   --tasks <a,b>           Task ids
   --track <terminal|image-lite|qa>
                           Filter by track
@@ -71,6 +71,7 @@ const parseArgs = (argv) => {
 
 const listCommand = () => {
   const harnesses = loadHarnesses(ROOT);
+  const models = loadModels(ROOT);
   const tasks = loadTasks(ROOT);
   const suites = fs.existsSync(path.join(ROOT, "suites"))
     ? fs.readdirSync(path.join(ROOT, "suites")).filter((f) => f.endsWith(".json"))
@@ -85,6 +86,11 @@ const listCommand = () => {
   for (const harness of harnesses) {
     const kind = harness.kind === "cli" ? `cli: ${harness.command[0]}` : `toy (${harness.behavior})`;
     console.log(`  ${harness.id.padEnd(14)} ${kind}`);
+  }
+  console.log("\nModels:");
+  for (const model of models) {
+    const mappedHarnesses = Object.keys(model.harnesses ?? {}).join(", ") || "toy/default";
+    console.log(`  ${model.id.padEnd(14)} ${(model.label ?? "").padEnd(28)} ${mappedHarnesses}`);
   }
   console.log("\nTasks:");
   for (const task of tasks) {
@@ -122,6 +128,7 @@ const importCommand = (options) => {
 
 const buildRunConfig = (options) => {
   const allHarnesses = loadHarnesses(ROOT);
+  const allModels = loadModels(ROOT);
   let allTasks = loadTasks(ROOT);
   let suite = null;
 
@@ -136,7 +143,12 @@ const buildRunConfig = (options) => {
     return found;
   });
 
-  const models = (options.models ?? suite?.models ?? "default").toString().split(",").map((s) => s.trim());
+  const modelIds = (options.models ?? suite?.models ?? "default").toString().split(",").map((s) => s.trim());
+  const models = modelIds.map((id) => {
+    const found = allModels.find((m) => m.id === id);
+    if (!found) throw new Error(`Unknown model "${id}". Run "harness-bench list".`);
+    return found;
+  });
 
   if (options.tasks) {
     const taskIds = options.tasks.split(",").map((s) => s.trim());

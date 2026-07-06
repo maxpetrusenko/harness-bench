@@ -97,24 +97,30 @@ export const writeReport = (outDir, results, config) => {
   const categoryRows = aggregateCategories(results);
   const hardnessGrid = aggregateByHardness(results);
   const pairedRows = pairedStats(results);
+  const skippedRows = config.skippedModelHarnesses ?? config.skipped_model_harnesses ?? [];
   fs.writeFileSync(path.join(outDir, "scores.csv"), toCsv(rows));
   if (categoryRows.length) fs.writeFileSync(path.join(outDir, "categories.csv"), toCsv(categoryRows));
   if (pairedRows.length) fs.writeFileSync(path.join(outDir, "paired-stats.csv"), toCsv(pairedRows));
+  if (skippedRows.length) fs.writeFileSync(path.join(outDir, "skipped-model-harnesses.csv"), toCsv(skippedRows));
   fs.writeFileSync(path.join(outDir, "failures.md"), buildFailuresMd(results));
   fs.writeFileSync(path.join(outDir, "hardness.json"), JSON.stringify(hardnessGrid, null, 2));
 
+  const modelManifest = (config.models ?? []).map((model) =>
+    typeof model === "string" ? { id: model, label: model } : { id: model.id, label: model.label ?? model.id, provider: model.provider ?? null }
+  );
   const data = {
     benchVersion: BENCH_VERSION,
     generatedAt: new Date().toISOString(),
     manifest: {
       suite: config.suite ?? null,
-      models: config.models ?? [],
+      models: modelManifest,
       context: config.context ?? config.conditions?.context ?? "fresh",
       skills: config.skills ?? config.conditions?.skills ?? "off",
       repeats: config.repeats ?? config.conditions?.repeats ?? 1,
       retest: Boolean(config.retest ?? config.conditions?.retest),
       continuous: config.continuous ?? config.conditions?.continuous ?? 1,
       harnesses: config.harnesses ?? [],
+      skipped_model_harnesses: config.skippedModelHarnesses ?? config.skipped_model_harnesses ?? [],
       provenance: config.harnesses?.[0]?.version ? config : null,
     },
     rows,
@@ -229,7 +235,7 @@ const badges = document.getElementById("badges");
 const manifest = DATA.manifest;
 for (const text of [
   "suite: " + (manifest.suite || "custom"),
-  "models: " + ((manifest.models || []).join(", ") || "default"),
+  "models: " + ((manifest.models || []).map((m) => m.label || m.id || m).join(", ") || "default"),
   "context: " + manifest.context,
   "skills: " + manifest.skills,
   "repeats: " + manifest.repeats,
@@ -238,6 +244,11 @@ for (const text of [
 ]) {
   const badge = el("span", { class: "badge" });
   badge.textContent = text;
+  badges.append(badge);
+}
+for (const skip of manifest.skipped_model_harnesses || []) {
+  const badge = el("span", { class: "badge" });
+  badge.textContent = "skipped: " + skip.harness + " × " + skip.model;
   badges.append(badge);
 }
 

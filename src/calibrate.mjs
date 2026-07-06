@@ -1,6 +1,6 @@
 import path from "node:path";
 import fs from "node:fs";
-import { loadHarnesses, loadTasks } from "./config.mjs";
+import { loadHarnesses, loadModels, loadTasks } from "./config.mjs";
 import { runMatrix } from "./runner.mjs";
 import { aggregate } from "./report.mjs";
 
@@ -13,6 +13,7 @@ export const runCalibration = async (root) => {
   if (fs.existsSync(outDir)) fs.rmSync(outDir, { recursive: true, force: true });
 
   const harnesses = loadHarnesses(root).filter((h) => ["oracle", "noop", "overclaim"].includes(h.id));
+  const models = loadModels(root).filter((m) => m.id === "default");
   const tasks = loadTasks(root);
 
   const config = {
@@ -20,7 +21,7 @@ export const runCalibration = async (root) => {
     outDir,
     suite: "calibrate",
     harnesses,
-    models: ["default"],
+    models,
     tasks,
     repeats: 1,
     context: "fresh",

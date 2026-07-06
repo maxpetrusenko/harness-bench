@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawn, spawnSync } from "node:child_process";
-import { resolveModelId } from "./config.mjs";
+import { resolveModelBinding } from "./config.mjs";
 import { extractMetrics, extractFinalText, detectSuccessClaim, detectBlockerReport } from "./metrics.mjs";
 import { parseEvents } from "./events.mjs";
 import { scoreCategories } from "./categories.mjs";
@@ -203,16 +203,16 @@ const executeCell = async (config, cell, cellIndex, totalCells, priorResult) => 
     skills: config.skills,
     priorRunSummary: priorRunSummary ?? null,
   };
-  const cellId = [harness.id, model, task.id, `r${repeat}`, phase].filter(Boolean).join("__").replace(/[^\w.-]+/g, "-");
+  const cellId = [harness.id, model.id, task.id, `r${repeat}`, phase].filter(Boolean).join("__").replace(/[^\w.-]+/g, "-");
   const cellDir = path.join(config.outDir, "cells", cellId);
   fs.mkdirSync(cellDir, { recursive: true });
 
   const workspace = prepareWorkspace(config, task, condition, cellDir);
   const prompt = buildPrompt(task, condition);
-  const modelId = harness.kind === "cli" ? resolveModelId(harness, model) : null;
+  const modelId = cell.model_id ?? null;
   const timeoutMs = (config.timeoutOverrideSeconds ?? task.timeout_seconds ?? 600) * 1000;
 
-  const label = `[${cellIndex + 1}/${totalCells}] ${harness.id} × ${model} × ${task.id}${phase ? ` (${phase})` : ""} repeat ${repeat}`;
+  const label = `[${cellIndex + 1}/${totalCells}] ${harness.id} × ${model.id} × ${task.id}${phase ? ` (${phase})` : ""} repeat ${repeat}`;
   console.log(`${label} ...`);
 
   const execution =
@@ -244,7 +244,8 @@ const executeCell = async (config, cell, cellIndex, totalCells, priorResult) => 
     harness: harness.id,
     harness_version: config.harnessVersions?.[harness.id] ?? null,
     harness_kind: harness.kind,
-    model,
+    model: model.id,
+    model_label: model.label ?? model.id,
     model_id: modelId,
     task: task.id,
     track: task.track ?? "terminal",
@@ -313,21 +314,36 @@ export const runMatrix = async (config) => {
   config.harnessVersions = Object.fromEntries(
     config.harnesses.map((h) => [h.id, config.harnessVersions?.[h.id] ?? null])
   );
-  const provenance = buildProvenance(config);
-  for (const h of provenance.harnesses) config.harnessVersions[h.id] = h.version;
-
-  fs.writeFileSync(path.join(config.outDir, "manifest.json"), JSON.stringify(provenance, null, 2));
 
   const cells = [];
+  const skippedCells = [];
   for (const harness of config.harnesses) {
     for (const model of config.models) {
+      const binding = resolveModelBinding(harness, model);
+      if (!binding.compatible) {
+        skippedCells.push({ harness: harness.id, model: model.id, reason: binding.reason });
+        continue;
+      }
       for (const task of config.tasks) {
         for (let repeat = 1; repeat <= config.repeats; repeat += 1) {
-          cells.push({ harness, model, task, repeat, phase: config.retest ? "A" : null });
+          cells.push({ harness, model, model_id: binding.model_id, task, repeat, phase: config.retest ? "A" : null });
         }
       }
     }
   }
+  config.skippedModelHarnesses = skippedCells;
+  if (skippedCells.length) {
+    const unique = [...new Map(skippedCells.map((skip) => [`${skip.harness}|||${skip.model}`, skip])).values()];
+    for (const skip of unique) console.log(`skip ${skip.harness} × ${skip.model}: ${skip.reason}`);
+  }
+  if (cells.length === 0) {
+    throw new Error("No runnable harness × model pairs selected. Check models/*.json mappings or use --models default.");
+  }
+
+  const provenance = buildProvenance(config);
+  for (const h of provenance.harnesses) config.harnessVersions[h.id] = h.version;
+
+  fs.writeFileSync(path.join(config.outDir, "manifest.json"), JSON.stringify(provenance, null, 2));
 
   const resultsPath = path.join(config.outDir, "results.jsonl");
   const results = [];
@@ -344,7 +360,7 @@ export const runMatrix = async (config) => {
   for (let seq = 1; seq <= continuous; seq += 1) {
     config.continuousSequence = seq;
     for (const cell of cells) {
-      const keyA = `${cell.harness.id}|||${cell.model}|||${cell.task.id}|||${cell.repeat}|||A|||${seq}`;
+      const keyA = `${cell.harness.id}|||${cell.model.id}|||${cell.task.id}|||${cell.repeat}|||A|||${seq}`;
       const resultA = await executeCell(config, { ...cell, phase: config.retest ? "A" : null }, index, totalCells, null);
       index += 1;
       resultA.continuous_sequence = seq;
@@ -367,7 +383,8 @@ export const runMatrix = async (config) => {
     bench_version: provenance.bench_version,
     suite: config.suite,
     harnesses: provenance.harnesses,
-    models: config.models,
+    models: provenance.models,
+    skipped_model_harnesses: skippedCells,
     tasks: config.tasks.map((t) => t.id),
     pass_rate: results.filter((r) => r.pass).length / Math.max(results.length, 1),
     runs: results.length,

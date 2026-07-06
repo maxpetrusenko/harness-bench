@@ -21,6 +21,19 @@ calibrate → prototype suite → harness-compare → hard / qa → continuous r
 
 ## Category testing matrix
 
+### Harness / model separation
+- **Config:** harness runtime in `harnesses/*.json`; model lanes and per-harness model ids in `models/*.json`
+- **Metric/artifact:** `manifest.json` `models[]`, `scores.csv` grouped by `harness,model`, `skipped-model-harnesses.csv`
+- **Test:**
+```bash
+harness-bench run \
+  --harnesses oracle,codex \
+  --models sonnet,gpt \
+  --tasks 01-create-file \
+  --out runs/model-split-mixed
+```
+- **Expected:** `oracle` runs on both model lanes, `codex × gpt` runs, `codex × sonnet` is skipped with a reason.
+
 ### Outcome / quality
 - **Tasks:** 01–04 (L0–L1), 08 (L3), 10 (L5), qa-01
 - **Metric:** `pass`, `partial_credit`, category `outcome`, `quality`
@@ -150,6 +163,8 @@ harness-bench history
 `manifest.json` per run stores:
 - `bench_version`, git sha
 - per-harness CLI `--version` string + config hash
+- per-model registry id, provider, label, and config hash
+- skipped harness/model pairs when a model lane is not supported by a harness
 - per-task `task_hash`
 
 Compare runs over time:

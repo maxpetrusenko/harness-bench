@@ -18,11 +18,12 @@ Codex presearch lives in `docs/`:
 
 ## Completion status
 
-`harness-bench` v1.0.0 is complete as a local scientific harness-benchmark prototype:
+`harness-bench` v1.1.0 is complete as a local scientific harness-benchmark prototype:
 
 - deterministic task verifiers
 - toy calibration harnesses
 - real CLI harness adapters
+- first-class model registry in `models/*.json`
 - SDK entrypoint
 - Terminal-Bench / SWE-bench import shells
 - context conditions: `fresh`, `loaded50k`, `loaded100k`, `conflict_context`
@@ -47,14 +48,31 @@ open runs/*/report.html   # pick the newest timestamp dir
 
 Smoke uses `oracle` (always passes), `noop` (honest fail), `overclaim` (claims success without doing work). Confirms runner, verifiers, honesty detection, and charts work.
 
-## Compare real harnesses (same model)
+## Harnesses and models are separate
 
-Pick one canonical model name; each harness maps it to its own flag:
+Harness configs describe the runtime only: command, parser, cwd, and model flag shape. Model configs live in `models/*.json` and describe which harnesses can run each model lane.
+
+```text
+harnesses/codex.json       -> how to invoke Codex CLI
+models/gpt.json            -> Codex uses gpt-5.3-codex, Cursor uses gpt-5, OpenCode uses openai/gpt-5
+```
+
+Run `list` to see both dimensions:
+
+```bash
+node bin/harness-bench.mjs list
+```
+
+Current model lanes:
 
 | Canonical | claude | cursor-agent | codex | opencode (OpenRouter) |
 |-----------|--------|--------------|-------|------------------------|
 | `sonnet`  | sonnet | sonnet-4.5   | —     | anthropic/claude-sonnet-4-5 |
 | `gpt`     | —      | gpt-5        | gpt-5.3-codex | openai/gpt-5 |
+
+If a harness has no mapping for a requested model, that harness/model pair is skipped before execution and written to `skipped-model-harnesses.csv`.
+
+## Compare harnesses across model lanes
 
 ```bash
 # Same Sonnet across Claude Code vs Cursor vs OpenCode
@@ -66,6 +84,15 @@ node bin/harness-bench.mjs run \
   --out runs/sonnet-compare
 
 open runs/sonnet-compare/report.html
+```
+
+```bash
+# Cross model lanes in one run. Invalid pairs are skipped, not failed.
+node bin/harness-bench.mjs run \
+  --harnesses claude,codex,cursor-agent,opencode \
+  --models sonnet,gpt \
+  --tasks 01-create-file,06-blocked-honesty \
+  --out runs/harness-model-matrix
 ```
 
 ```bash
@@ -105,6 +132,8 @@ runs/<name>/
   manifest.json      # frozen config
   results.jsonl      # one JSON object per cell
   scores.csv         # aggregated by harness × model
+  skipped-model-harnesses.csv
+                    # requested pairs with no model mapping
   paired-stats.csv   # paired harness deltas on matched cells
   failures.md        # clustered failure fingerprints
   report.html        # bar charts + scorecard + per-task grid
@@ -154,6 +183,19 @@ node bin/harness-bench.mjs list
 | oracle / noop / overclaim | toy | pipeline smoke only |
 
 Add your harness: drop `harnesses/my-harness.json` following the schema in `harnesses/claude.json`.
+
+Add a model lane: drop `models/my-model.json`:
+
+```json
+{
+  "id": "my-model",
+  "label": "My model lane",
+  "provider": "provider-name",
+  "harnesses": {
+    "my-harness": "provider/model-id-for-this-cli"
+  }
+}
+```
 
 ## CLI reference
 
@@ -217,6 +259,7 @@ Codex's presearch is solid. Key takeaways already baked in:
 |---------------------|-------------|
 | Minibench before Terminal-Bench | ✅ 13 local tasks |
 | Same model × multiple harnesses | ✅ matrix runner |
+| Clean harness/model split | ✅ `harnesses/*.json` + `models/*.json` |
 | Deterministic verifiers first | ✅ bash verify.sh |
 | Skills on/off | ✅ `--skills` |
 | Context load test | ✅ `--context loaded50k` |
