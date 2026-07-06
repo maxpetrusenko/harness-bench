@@ -146,7 +146,7 @@ runs/<name>/
 - **Wall seconds per solved task**
 - **Cost per solved task** (when CLI reports usage)
 - **Scorecard** — timeouts, overclaims, honest failures, retest gain
-- **Per-task grid** — green/red dots per harness × task
+- **Per-task grid** — green/red dots per harness × model × task
 
 ## Tasks (13)
 

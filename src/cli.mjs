@@ -89,7 +89,7 @@ const listCommand = () => {
   }
   console.log("\nModels:");
   for (const model of models) {
-    const mappedHarnesses = Object.keys(model.harnesses ?? {}).join(", ") || "toy/default";
+    const mappedHarnesses = Object.keys(model.harnesses ?? {}).join(", ") || "all harnesses, no model flag";
     console.log(`  ${model.id.padEnd(14)} ${(model.label ?? "").padEnd(28)} ${mappedHarnesses}`);
   }
   console.log("\nTasks:");
