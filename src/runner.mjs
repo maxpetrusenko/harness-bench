@@ -5,7 +5,7 @@ import { resolveModelId } from "./config.mjs";
 import { extractMetrics, extractFinalText, detectSuccessClaim, detectBlockerReport } from "./metrics.mjs";
 import { parseEvents } from "./events.mjs";
 import { scoreCategories } from "./categories.mjs";
-import { buildProvenance, appendRunHistory } from "./versions.mjs";
+import { BENCH_VERSION, buildProvenance, appendRunHistory } from "./versions.mjs";
 
 const copyDir = (from, to) => {
   fs.mkdirSync(to, { recursive: true });
@@ -309,7 +309,7 @@ const buildPriorRunSummary = (result) =>
 
 export const runMatrix = async (config) => {
   fs.mkdirSync(config.outDir, { recursive: true });
-  config.benchVersion = config.benchVersion ?? null;
+  config.benchVersion = config.benchVersion ?? BENCH_VERSION;
   config.harnessVersions = Object.fromEntries(
     config.harnesses.map((h) => [h.id, config.harnessVersions?.[h.id] ?? null])
   );
