@@ -1,0 +1,6 @@
+{
+  "id": "oracle",
+  "kind": "toy",
+  "behavior": "oracle",
+  "description": "Applies each task's reference solution (oracle.sh). Should pass everything that is passable. Validates verifiers and the pipeline for free."
+}

@@ -1,0 +1,8 @@
+[
+  { "id": "o-1001", "amountCents": 1250, "status": "shipped" },
+  { "id": "o-1002", "amountCents": 300, "status": "pending" },
+  { "id": "o-1003", "amountCents": 9900, "status": "shipped" },
+  { "id": "o-1004", "amountCents": 4550, "status": "cancelled" },
+  { "id": "o-1005", "amountCents": 725, "status": "pending" },
+  { "id": "o-1006", "amountCents": 60, "status": "shipped" }
+]

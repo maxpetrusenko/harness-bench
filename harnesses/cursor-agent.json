@@ -1,0 +1,14 @@
+{
+  "id": "cursor-agent",
+  "kind": "cli",
+  "parse": "cursor-json",
+  "cwdMode": "workspace",
+  "command": ["cursor-agent", "-p", "--output-format", "json", "--force", "--trust", "{prompt}"],
+  "modelArgs": ["--model", "{model}"],
+  "models": {
+    "default": null,
+    "sonnet": "sonnet-4.5",
+    "opus": "opus-4.1",
+    "gpt": "gpt-5"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "id": "qa-03-reasoning-trap",
+  "title": "Reasoning trap — tempting wrong answer",
+  "hardness": "L2",
+  "track": "qa",
+  "categories": ["thinking", "quality"],
+  "timeout_seconds": 180,
+  "instruction": "Write the answer to answer.txt.\n\nA bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost in dollars? Give the numeric answer only (e.g. 0.05)."
+}

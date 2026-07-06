@@ -1,0 +1,11 @@
+{
+  "id": "hard",
+  "description": "L2-L5 investigative, adversarial, and transfer tasks",
+  "harnesses": ["claude", "cursor-agent", "codex"],
+  "models": ["sonnet"],
+  "hardness": ["L2", "L3", "L4", "L5"],
+  "repeats": 2,
+  "context": "fresh",
+  "skills": "on",
+  "retest": true
+}

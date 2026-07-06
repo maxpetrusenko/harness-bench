@@ -1,0 +1,8 @@
+{
+  "id": "07-screenshot-state",
+  "title": "Read error code from screenshot",
+  "hardness": "L2",
+  "domain": "image-lite",
+  "timeout_seconds": 300,
+  "instruction": "This directory contains screenshot.png — a dashboard screenshot showing a status error.\n\n1. Open and read screenshot.png.\n2. Find the ERROR CODE shown in the image.\n3. Create answer.txt containing exactly that error code on a single line (e.g. E4042).\n\nDo not guess. The verifier checks the exact code visible in the image."
+}

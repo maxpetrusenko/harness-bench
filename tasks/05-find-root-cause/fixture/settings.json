@@ -1,0 +1,4 @@
+{
+  "endpoint": "mock://records",
+  "max_retries": 3
+}

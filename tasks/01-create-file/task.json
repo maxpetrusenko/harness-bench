@@ -1,0 +1,7 @@
+{
+  "id": "01-create-file",
+  "title": "Create a file with exact content",
+  "hardness": "L0",
+  "timeout_seconds": 180,
+  "instruction": "Create a file named output.txt in the current directory containing exactly this single line (no extra whitespace or trailing content beyond one final newline):\n\nharness-bench: hello\n"
+}

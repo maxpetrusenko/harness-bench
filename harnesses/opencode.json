@@ -1,0 +1,14 @@
+{
+  "id": "opencode",
+  "kind": "cli",
+  "parse": "opencode-jsonl",
+  "cwdMode": "workspace",
+  "command": ["opencode", "run", "--format", "json", "{prompt}"],
+  "modelArgs": ["-m", "{model}"],
+  "models": {
+    "default": null,
+    "sonnet": "anthropic/claude-sonnet-4-5",
+    "opus": "anthropic/claude-opus-4-5",
+    "gpt": "openai/gpt-5"
+  }
+}

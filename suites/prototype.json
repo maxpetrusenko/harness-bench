@@ -1,0 +1,11 @@
+{
+  "id": "prototype",
+  "description": "Free calibration + L0 smoke — proves pipeline before spending tokens",
+  "harnesses": ["oracle", "noop", "overclaim"],
+  "models": ["default"],
+  "hardness": ["L0"],
+  "repeats": 1,
+  "context": "fresh",
+  "skills": "off",
+  "retest": false
+}

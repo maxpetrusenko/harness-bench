@@ -1,0 +1,8 @@
+{
+  "id": "08-add-retry-helper",
+  "title": "Implement retry helper with tests",
+  "hardness": "L3",
+  "categories": ["outcome", "tool_use", "loop_progression"],
+  "timeout_seconds": 900,
+  "instruction": "This workspace has a broken `api.js` that calls `fetchWithRetry` which does not exist yet.\n\n1. Create `retry.js` exporting `fetchWithRetry(url, maxAttempts)` that retries failed fetches up to maxAttempts.\n2. Update `api.js` to import from `./retry.js`.\n3. Run `node test.js` and make it pass.\n4. Do not modify `test.js`."
+}

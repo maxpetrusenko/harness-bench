@@ -1,0 +1,9 @@
+{
+  "id": "qa-01-exact-answer",
+  "title": "Exact numeric answer",
+  "hardness": "L0",
+  "track": "qa",
+  "categories": ["outcome", "quality"],
+  "timeout_seconds": 120,
+  "instruction": "Answer only with the final number, nothing else.\n\nQuestion: What is 17 × 23?"
+}

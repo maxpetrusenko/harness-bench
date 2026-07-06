@@ -1,0 +1,7 @@
+{
+  "id": "04-json-transform",
+  "title": "Transform data.json into summary.json",
+  "hardness": "L1",
+  "timeout_seconds": 300,
+  "instruction": "Read data.json (an array of orders). Write summary.json with exactly this shape: {\"orderCount\": <number of orders>, \"totalCents\": <sum of amountCents over all orders>, \"byStatus\": {\"<status>\": <count>, ...}}. Statuses in byStatus must be the ones that actually appear in the data. Use compact or pretty JSON, either is fine."
+}

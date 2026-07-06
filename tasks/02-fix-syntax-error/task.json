@@ -1,0 +1,7 @@
+{
+  "id": "02-fix-syntax-error",
+  "title": "Fix a syntax error so the script runs",
+  "hardness": "L1",
+  "timeout_seconds": 300,
+  "instruction": "The script main.js crashes with a syntax error. Fix it so that `node main.js` runs successfully and prints the correct greeting. Do not change what the program is supposed to output."
+}

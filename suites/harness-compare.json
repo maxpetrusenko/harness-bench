@@ -1,0 +1,11 @@
+{
+  "id": "harness-compare",
+  "description": "Core harness discrimination on L0-L2 terminal tasks — same model, different runtime",
+  "harnesses": ["claude", "cursor-agent", "codex", "opencode"],
+  "models": ["sonnet"],
+  "hardness": ["L0", "L1", "L2"],
+  "repeats": 2,
+  "context": "fresh",
+  "skills": "off",
+  "retest": false
+}

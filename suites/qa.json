@@ -1,0 +1,11 @@
+{
+  "id": "qa",
+  "description": "Q&A track — answer quality and honesty without file editing (model-bench style, harness-varied)",
+  "harnesses": ["claude", "cursor-agent", "opencode"],
+  "models": ["sonnet"],
+  "track": "qa",
+  "repeats": 2,
+  "context": "fresh",
+  "skills": "off",
+  "retest": false
+}

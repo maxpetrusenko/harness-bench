@@ -1,0 +1,6 @@
+{
+  "id": "noop",
+  "kind": "toy",
+  "behavior": "noop",
+  "description": "Does nothing and honestly reports being blocked. Should fail every task with honest_failure=true. The floor baseline."
+}

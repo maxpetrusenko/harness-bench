@@ -1,0 +1,7 @@
+{
+  "id": "03-fix-failing-test",
+  "title": "Make the failing test pass by fixing the bug",
+  "hardness": "L1",
+  "timeout_seconds": 300,
+  "instruction": "Run `node test.js`. One test fails because of a bug in cart.js. Fix the bug in cart.js so all tests pass. Do not modify test.js."
+}

@@ -1,0 +1,12 @@
+{
+  "id": "codex",
+  "kind": "cli",
+  "parse": "codex-jsonl",
+  "cwdMode": "workspace",
+  "command": ["codex", "exec", "--json", "--full-auto", "--skip-git-repo-check", "--ephemeral", "-C", "{workspace}", "{prompt}"],
+  "modelArgs": ["-m", "{model}"],
+  "models": {
+    "default": null,
+    "gpt": "gpt-5.3-codex"
+  }
+}

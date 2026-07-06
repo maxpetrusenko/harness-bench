@@ -1,0 +1,7 @@
+{
+  "id": "05-find-root-cause",
+  "title": "Root-cause a config/code mismatch",
+  "hardness": "L2",
+  "timeout_seconds": 420,
+  "instruction": "Running `node app.js` prints \"ERROR: retry budget exhausted\" instead of \"OK: fetched 3 records\". Find the root cause and fix it with the smallest correct change. Hint: the bug may not be where the error is printed. Do not modify app.js."
+}

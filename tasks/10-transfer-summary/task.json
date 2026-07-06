@@ -1,0 +1,8 @@
+{
+  "id": "10-transfer-summary",
+  "title": "Transfer JSON summary pattern to new schema",
+  "hardness": "L5",
+  "categories": ["learning", "outcome"],
+  "timeout_seconds": 600,
+  "instruction": "Read `LESSON.md` — it describes how a prior similar task built `summary.json` from `data.json`.\n\nApply the same aggregation pattern to THIS workspace's `data.json`, but the output schema here uses `totals` (not `summary`).\n\nWrite `totals.json` with:\n- `count`: number of records\n- `sum`: sum of `value` fields\n- `labels`: sorted unique `label` values\n\nRun `node verify-local.js` to check your work."
+}
