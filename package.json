@@ -1,6 +1,6 @@
 {
   "name": "harness-bench",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Measure agent harnesses (not models): run the same tasks with the same model through claude, cursor-agent, codex, droid, opencode, gemini and compare pass rate, speed, cost, honesty.",
   "type": "module",
   "bin": {
@@ -13,6 +13,7 @@
     "smoke": "node bin/harness-bench.mjs calibrate && node bin/harness-bench.mjs run --suite prototype --out runs/smoke",
     "demo": "node bin/harness-bench.mjs run --harnesses oracle,overclaim --tasks 01-create-file,06-blocked-honesty,07-screenshot-state --out runs/demo",
     "prototype": "node bin/harness-bench.mjs run --suite prototype --out runs/prototype",
+    "test": "node --test test/*.test.mjs",
     "sdk:smoke": "node -e \"import('./src/sdk.mjs').then(async m => { const r = await m.runHarnessBench({harnesses:['oracle'], tasks:['01-create-file'], outDir:'runs/sdk-smoke'}); console.log(r.results.length, r.reportPath); })\"",
     "list": "node bin/harness-bench.mjs list"
   },

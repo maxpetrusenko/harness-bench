@@ -18,7 +18,7 @@ Codex presearch lives in `docs/`:
 
 ## Completion status
 
-`harness-bench` v1.1.0 is complete as a local scientific harness-benchmark prototype:
+`harness-bench` v1.2.0 is complete as a local scientific harness-benchmark prototype:
 
 - deterministic task verifiers
 - toy calibration harnesses
@@ -31,6 +31,7 @@ Codex presearch lives in `docs/`:
 - same-task retest
 - image-lite and Q&A tracks
 - category scores
+- setup/runtime error classification
 - paired pass-delta stats
 - versioned manifests and history
 
@@ -135,7 +136,7 @@ runs/<name>/
   skipped-model-harnesses.csv
                     # requested pairs with no model mapping
   paired-stats.csv   # paired harness deltas on matched cells
-  failures.md        # clustered failure fingerprints
+  failures.md        # clustered failure fingerprints, including setup/runtime errors
   report.html        # bar charts + scorecard + per-task grid
   cells/             # stdout, stderr, workspace per run
 ```
@@ -243,6 +244,7 @@ Imported task shells intentionally require `verify.sh.local` before they can pas
 
 **Primary (deterministic):**
 - `pass_rate` — oracle verifier
+- `setup_error_rate` — CLI/auth/model/runtime failures excluded from task pass-rate denominators
 - `wall_seconds_per_solved`
 - `cost_per_solved` — parsed from CLI JSON when available
 - `timeout_rate`, `overclaim_rate`, `honest_failure_rate`
@@ -274,6 +276,7 @@ Codex's presearch is solid. Key takeaways already baked in:
 | Paired stats | ✅ `paired-stats.csv` |
 | Inspect AI integration | optional future substrate |
 | Failure fingerprints | ✅ failures.md |
+| Setup/runtime errors separated from task failures | ✅ `setup_error_rate` + setup buckets |
 
 **Not the same thing:** Fable (planning agent in Cursor) vs Claude Code vs Cursor agent — Fable is a *worker*, these harness configs are *runtimes*. To compare Fable you'd add a harness adapter that invokes Fable with the same task prompt.
 

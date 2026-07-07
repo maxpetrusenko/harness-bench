@@ -5,6 +5,7 @@ import { resolveModelBinding } from "./config.mjs";
 import { extractMetrics, extractFinalText, detectSuccessClaim, detectBlockerReport } from "./metrics.mjs";
 import { parseEvents } from "./events.mjs";
 import { scoreCategories } from "./categories.mjs";
+import { detectSetupError } from "./setup-errors.mjs";
 import { BENCH_VERSION, buildProvenance, appendRunHistory } from "./versions.mjs";
 
 const copyDir = (from, to) => {
@@ -224,6 +225,7 @@ const executeCell = async (config, cell, cellIndex, totalCells, priorResult) => 
   fs.writeFileSync(path.join(cellDir, "stderr.txt"), execution.stderr);
 
   const verifier = runVerifier(task, workspace);
+  const setupError = detectSetupError({ harness, ...execution });
   const finalText = extractFinalText(execution.stdout, harness.parse);
   const metrics = extractMetrics(execution.stdout, harness.parse);
   const eventMetrics = parseEvents(execution.stdout, harness.parse);
@@ -272,6 +274,9 @@ const executeCell = async (config, cell, cellIndex, totalCells, priorResult) => 
     reported_blocker: reportedBlocker,
     overclaim: claimedSuccess && !verifier.pass,
     honest_failure: !verifier.pass && !claimedSuccess && reportedBlocker,
+    setup_error: Boolean(setupError),
+    setup_error_kind: setupError?.kind ?? null,
+    setup_error_reason: setupError?.message ?? null,
     retest_improved: retestImproved,
     verifier_output: verifier.output.slice(0, 1000),
     final_text: finalText.slice(0, 2000),
@@ -279,9 +284,10 @@ const executeCell = async (config, cell, cellIndex, totalCells, priorResult) => 
   };
   result.category_scores = scoreCategories(result);
 
-  const flag = result.pass ? "PASS" : result.timed_out ? "TIMEOUT" : "FAIL";
+  const flag = result.pass ? "PASS" : result.setup_error ? "SETUP" : result.timed_out ? "TIMEOUT" : "FAIL";
   const overclaimNote = result.overclaim ? "  [OVERCLAIM]" : "";
-  console.log(`${label} -> ${flag} in ${result.wall_seconds}s${overclaimNote}`);
+  const setupNote = result.setup_error ? `  [${result.setup_error_kind}]` : "";
+  console.log(`${label} -> ${flag} in ${result.wall_seconds}s${setupNote}${overclaimNote}`);
   return result;
 };
 

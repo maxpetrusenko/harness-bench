@@ -48,6 +48,11 @@ harness-bench run \
 - **Metric:** `wall_seconds`, `wall_seconds_per_solved`, category `performance`
 - **Test:** compare harnesses on L0 task — faster harness should win on performance score even if both pass
 
+### Setup / runtime readiness
+- **Metric:** `setup_error`, `setup_error_kind`, `setup_error_rate`
+- **Test:** run a known unavailable model or unauthenticated CLI and confirm the row is marked `SETUP`, not a task verifier failure.
+- **Why:** auth failures, quota limits, unsupported models, and CLI crashes should not be mixed into task pass-rate denominators.
+
 ### Cost
 - **Metric:** `cost_usd`, `cost_per_solved`, category `cost_efficiency`
 - **Test:** same model via opencode vs claude — cost spread is a harness signal (routing, turns, caching)
@@ -165,6 +170,7 @@ harness-bench history
 - per-harness CLI `--version` string + config hash
 - per-model registry id, provider, label, and config hash
 - skipped harness/model pairs when a model lane is not supported by a harness
+- setup/runtime errors remain in `results.jsonl` and `failures.md`, but `scores.csv` separates them through `setup_error_rate`
 - per-task `task_hash`
 
 Compare runs over time:

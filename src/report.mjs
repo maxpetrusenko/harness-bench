@@ -19,23 +19,27 @@ export const aggregate = (results) => {
   const rows = [];
   for (const [key, runs] of groups) {
     const [harness, model] = key.split("|||");
-    const passes = runs.filter((r) => r.pass);
-    const costs = runs.map((r) => r.cost_usd).filter((c) => typeof c === "number");
-    const retestA = runs.filter((r) => r.phase === "A");
-    const retestB = runs.filter((r) => r.phase === "B");
+    const setupErrors = runs.filter((r) => r.setup_error);
+    const taskRuns = runs.filter((r) => !r.setup_error);
+    const passes = taskRuns.filter((r) => r.pass);
+    const costs = taskRuns.map((r) => r.cost_usd).filter((c) => typeof c === "number");
+    const retestA = taskRuns.filter((r) => r.phase === "A");
+    const retestB = taskRuns.filter((r) => r.phase === "B");
     const passRateA = retestA.length ? retestA.filter((r) => r.pass).length / retestA.length : null;
     const passRateB = retestB.length ? retestB.filter((r) => r.pass).length / retestB.length : null;
     rows.push({
       harness,
       model,
       runs: runs.length,
-      pass_rate: round(passes.length / runs.length, 3),
+      task_runs: taskRuns.length,
+      pass_rate: taskRuns.length ? round(passes.length / taskRuns.length, 3) : null,
       solved: passes.length,
-      timeout_rate: round(runs.filter((r) => r.timed_out).length / runs.length, 3),
-      overclaim_rate: round(runs.filter((r) => r.overclaim).length / runs.length, 3),
-      honest_failure_rate: round(runs.filter((r) => r.honest_failure).length / runs.length, 3),
-      mean_wall_seconds: round(mean(runs.map((r) => r.wall_seconds))),
-      wall_seconds_per_solved: passes.length ? round(runs.reduce((a, r) => a + r.wall_seconds, 0) / passes.length) : null,
+      setup_error_rate: round(setupErrors.length / runs.length, 3),
+      timeout_rate: taskRuns.length ? round(taskRuns.filter((r) => r.timed_out).length / taskRuns.length, 3) : null,
+      overclaim_rate: taskRuns.length ? round(taskRuns.filter((r) => r.overclaim).length / taskRuns.length, 3) : null,
+      honest_failure_rate: taskRuns.length ? round(taskRuns.filter((r) => r.honest_failure).length / taskRuns.length, 3) : null,
+      mean_wall_seconds: round(mean(taskRuns.map((r) => r.wall_seconds))),
+      wall_seconds_per_solved: passes.length ? round(taskRuns.reduce((a, r) => a + r.wall_seconds, 0) / passes.length) : null,
       mean_cost_usd: costs.length ? round(mean(costs), 4) : null,
       cost_per_solved: costs.length && passes.length ? round(costs.reduce((a, b) => a + b, 0) / passes.length, 4) : null,
       retest_gain: passRateA !== null && passRateB !== null ? round(passRateB - passRateA, 3) : null,
@@ -65,7 +69,8 @@ const buildFailuresMd = (results) => {
   const buckets = new Map();
   for (const result of failures) {
     let label;
-    if (result.timed_out) label = "timeout";
+    if (result.setup_error) label = `setup/runtime error (${result.setup_error_kind ?? "unknown"})`;
+    else if (result.timed_out) label = "timeout";
     else if (result.overclaim) label = "overclaim (claimed success, verifier failed)";
     else if (result.honest_failure) label = "honest failure (reported blocker)";
     else label = "verifier_failed";
@@ -81,6 +86,7 @@ const buildFailuresMd = (results) => {
         `- **${run.harness}** × ${run.model} × ${run.task}${run.phase && run.phase !== "single" ? ` (${run.phase})` : ""}` +
           (run.timed_out ? " — timed out" : "")
       );
+      if (run.setup_error_reason) lines.push(`  - setup: \`${run.setup_error_reason.replace(/`/g, "'").slice(0, 160)}\``);
       if (run.verifier_output) {
         const snippet = run.verifier_output.split("\n")[0].slice(0, 120);
         if (snippet) lines.push(`  - verifier: \`${snippet}\``);
@@ -139,6 +145,8 @@ export const writeReport = (outDir, results, config) => {
       overclaim: r.overclaim,
       wall_seconds: r.wall_seconds,
       cost_usd: r.cost_usd,
+      setup_error: r.setup_error,
+      setup_error_kind: r.setup_error_kind,
     })),
   };
 
@@ -417,9 +425,9 @@ for (const level of hLevels) {
 // ---- scorecard table ----
 const scorecard = document.getElementById("scorecard");
 const columns = [
-  ["harness", "Harness"], ["model", "Model"], ["runs", "Runs"], ["pass_rate", "Pass rate"],
+  ["harness", "Harness"], ["model", "Model"], ["runs", "Runs"], ["task_runs", "Task runs"], ["pass_rate", "Pass rate"],
   ["wall_seconds_per_solved", "Sec/solve"], ["cost_per_solved", "$/solve"],
-  ["timeout_rate", "Timeouts"], ["overclaim_rate", "Overclaims"],
+  ["setup_error_rate", "Setup errs"], ["timeout_rate", "Timeouts"], ["overclaim_rate", "Overclaims"],
   ["honest_failure_rate", "Honest fails"], ["retest_gain", "Retest gain"],
 ];
 const headRow = el("tr");
@@ -458,8 +466,8 @@ for (const task of tasks) {
     const cellRuns = taskResults.filter((r) => r.harness === harness && r.model === model);
     const td = el("td");
     for (const run of cellRuns) {
-      const dot = el("span", { class: "grid-dot", title: (run.phase !== "single" ? run.phase + " " : "") + "repeat " + run.repeat + ": " + (run.pass ? "pass" : run.timed_out ? "timeout" : "fail") + " " + run.wall_seconds + "s" + (run.overclaim ? " OVERCLAIM" : "") });
-      dot.style.background = run.pass ? "#34d399" : run.timed_out ? "#fbbf24" : "#f87171";
+      const dot = el("span", { class: "grid-dot", title: (run.phase !== "single" ? run.phase + " " : "") + "repeat " + run.repeat + ": " + (run.pass ? "pass" : run.setup_error ? "setup error" : run.timed_out ? "timeout" : "fail") + " " + run.wall_seconds + "s" + (run.overclaim ? " OVERCLAIM" : "") });
+      dot.style.background = run.pass ? "#34d399" : run.setup_error ? "#9ca3af" : run.timed_out ? "#fbbf24" : "#f87171";
       if (run.overclaim) dot.style.outline = "2px solid #fbbf24";
       td.append(dot);
     }
