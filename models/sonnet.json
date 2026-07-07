@@ -5,7 +5,8 @@
   "description": "Best-effort same Sonnet-family lane across CLIs. Exact vendor ids are recorded per run.",
   "harnesses": {
     "claude": "sonnet",
-    "cursor-agent": "sonnet-4.5",
+    "cursor-agent": "claude-sonnet-5-thinking-high",
+    "droid": "claude-sonnet-4-5-20250929",
     "opencode": "anthropic/claude-sonnet-4-5"
   }
 }

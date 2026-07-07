@@ -4,5 +4,11 @@
   "parse": "gemini-json",
   "cwdMode": "workspace",
   "command": ["gemini", "--yolo", "-o", "json", "-p", "{prompt}"],
-  "modelArgs": ["-m", "{model}"]
+  "modelArgs": ["-m", "{model}"],
+  "lifecycle": {
+    "version": ["gemini", "--version"],
+    "install": ["Install Gemini CLI from official Google docs"],
+    "uninstall": ["remove the Gemini CLI using the same package manager used for install"],
+    "notes": "Requires Gemini CLI authentication before scored runs."
+  }
 }

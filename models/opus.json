@@ -5,6 +5,7 @@
   "description": "Best-effort same Opus-family lane across CLIs. Exact vendor ids are recorded per run.",
   "harnesses": {
     "claude": "opus",
+    "cursor-agent": "claude-opus-4-8-thinking-high",
     "droid": "claude-opus-4-5-20251101"
   }
 }

@@ -18,7 +18,7 @@ Codex presearch lives in `docs/`:
 
 ## Completion status
 
-`harness-bench` v1.2.0 is complete as a local scientific harness-benchmark prototype:
+`harness-bench` v1.3.0 is complete as a local scientific harness-benchmark prototype:
 
 - deterministic task verifiers
 - toy calibration harnesses
@@ -32,6 +32,7 @@ Codex presearch lives in `docs/`:
 - image-lite and Q&A tracks
 - category scores
 - setup/runtime error classification
+- harness install/uninstall lifecycle doctor
 - paired pass-delta stats
 - versioned manifests and history
 
@@ -62,16 +63,28 @@ Run `list` to see both dimensions:
 
 ```bash
 node bin/harness-bench.mjs list
+node bin/harness-bench.mjs doctor
 ```
 
 Current model lanes:
 
-| Canonical | claude | cursor-agent | codex | opencode (OpenRouter) |
-|-----------|--------|--------------|-------|------------------------|
-| `sonnet`  | sonnet | sonnet-4.5   | —     | anthropic/claude-sonnet-4-5 |
-| `gpt`     | —      | gpt-5        | gpt-5.3-codex | openai/gpt-5 |
+| Canonical | claude | cursor-agent | codex | droid | opencode (OpenRouter) |
+|-----------|--------|--------------|-------|-------|------------------------|
+| `sonnet`  | sonnet | claude-sonnet-5-thinking-high | — | claude-sonnet-4-5-20250929 | anthropic/claude-sonnet-4-5 |
+| `gpt`     | —      | gpt-5.5-high | gpt-5.3-codex | gpt-5.2 | openai/gpt-5 |
+| `opus`    | opus   | claude-opus-4-8-thinking-high | — | claude-opus-4-5-20251101 | — |
+| `cursor-gpt55` | — | gpt-5.5-high | — | — | — |
+| `cursor-composer` | — | composer-2.5 | — | — | — |
 
 If a harness has no mapping for a requested model, that harness/model pair is skipped before execution and written to `skipped-model-harnesses.csv`.
+
+Cursor model lanes are subscription-backed. Refresh available slugs with:
+
+```bash
+cursor-agent --list-models
+```
+
+Use the exact slug from that output. The Cursor CLI accepts `--model <slug>` in headless mode; avoid bracket parameter syntax for benchmark runs because current Cursor CLI forum guidance says direct slugs are the reliable path.
 
 ## Compare harnesses across model lanes
 
@@ -223,6 +236,22 @@ const run = await runHarnessBench({
 console.log(run.reportPath);
 ```
 
+Run Cursor through the SDK with an explicit subscription model flag:
+
+```js
+import { runHarnessBench } from "harness-bench";
+
+const run = await runHarnessBench({
+  harnesses: ["cursor-agent"],
+  models: ["cursor-gpt55"],
+  tasks: ["01-create-file"],
+  timeout: 180,
+  outDir: "runs/cursor-sdk-gpt55"
+});
+
+console.log(run.reportPath);
+```
+
 Smoke:
 
 ```bash
@@ -250,6 +279,17 @@ Imported task shells intentionally require `verify.sh.local` before they can pas
 - `timeout_rate`, `overclaim_rate`, `honest_failure_rate`
 - `retest_gain` — pass rate Round B minus Round A
 - `pass_delta_b_minus_a` — paired harness delta in `paired-stats.csv`
+
+## Harness lifecycle
+
+`doctor` checks whether real harness CLIs are available and prints the install/uninstall command recorded in each harness config:
+
+```bash
+node bin/harness-bench.mjs doctor
+node bin/harness-bench.mjs doctor --harnesses cursor-agent,droid,cline
+```
+
+The benchmark does not silently install or remove global tools during scored runs. That keeps provenance clean: if `cline` is missing or Droid lacks auth, the run records a setup/runtime error instead of pretending the task failed. Install/uninstall commands are documented in `harnesses/*.json` so temporary harness setup can be done intentionally before a paid run.
 
 **Honesty:** agents that claim success when the verifier fails get flagged `[OVERCLAIM]` even if you'd eyeball the stdout as confident.
 

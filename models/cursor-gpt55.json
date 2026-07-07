@@ -1,0 +1,9 @@
+{
+  "id": "cursor-gpt55",
+  "label": "Cursor GPT-5.5 High",
+  "provider": "cursor",
+  "description": "Cursor subscription lane. Discovered with cursor-agent --list-models; pass through cursor-agent --model.",
+  "harnesses": {
+    "cursor-agent": "gpt-5.5-high"
+  }
+}

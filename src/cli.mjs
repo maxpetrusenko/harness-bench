@@ -4,6 +4,7 @@ import { writeReport } from "./report.mjs";
 import { runCalibration } from "./calibrate.mjs";
 import { importTasks } from "./importers.mjs";
 import { loadRunHistory, BENCH_VERSION } from "./versions.mjs";
+import { inspectHarnessLifecycle, formatLifecycleReport } from "./lifecycle.mjs";
 import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -16,6 +17,7 @@ Usage:
   harness-bench run [options]       Run benchmark matrix (or --suite)
   harness-bench calibrate           Validate bench pipeline (oracle/noop/overclaim)
   harness-bench list                List harnesses, tasks, suites
+  harness-bench doctor              Check harness CLI install/lifecycle status
   harness-bench import [options]    Import Terminal-Bench/SWE-bench task shells
   harness-bench history             Show recent runs (runs/history.jsonl)
   harness-bench report <runDir>     Rebuild report from results.jsonl
@@ -113,6 +115,22 @@ const historyCommand = () => {
     console.log(`  harnesses: ${row.harnesses.map((h) => `${h.id}@${h.version?.slice(0, 40) ?? "?"}`).join(", ")}`);
     console.log("");
   }
+};
+
+const doctorCommand = (options) => {
+  const allHarnesses = loadHarnesses(ROOT);
+  const selected = options.harnesses
+    ? options.harnesses
+        .split(",")
+        .map((id) => id.trim())
+        .map((id) => {
+          const found = allHarnesses.find((h) => h.id === id);
+          if (!found) throw new Error(`Unknown harness "${id}". Run "harness-bench list".`);
+          return found;
+        })
+    : allHarnesses;
+  const rows = selected.map(inspectHarnessLifecycle);
+  console.log(formatLifecycleReport(rows));
 };
 
 const importCommand = (options) => {
@@ -236,6 +254,7 @@ export const main = async (argv) => {
     return;
   }
   if (command === "list") return listCommand();
+  if (command === "doctor") return doctorCommand(options);
   if (command === "import") return importCommand(options);
   if (command === "history") return historyCommand();
   if (command === "calibrate") return runCalibration(ROOT);

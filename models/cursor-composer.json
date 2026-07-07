@@ -1,0 +1,9 @@
+{
+  "id": "cursor-composer",
+  "label": "Cursor Composer 2.5",
+  "provider": "cursor",
+  "description": "Cursor-native Composer lane. Discovered with cursor-agent --list-models; pass through cursor-agent --model.",
+  "harnesses": {
+    "cursor-agent": "composer-2.5"
+  }
+}

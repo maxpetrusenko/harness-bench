@@ -1,0 +1,14 @@
+{
+  "id": "cline",
+  "kind": "cli",
+  "parse": "cline-json",
+  "cwdMode": "workspace",
+  "command": ["cline", "--json", "--cwd", "{workspace}", "{prompt}"],
+  "modelArgs": ["--model", "{model}"],
+  "lifecycle": {
+    "version": ["cline", "version"],
+    "install": ["npm install -g cline"],
+    "uninstall": ["npm uninstall -g cline"],
+    "notes": "Open-source Cline CLI. Requires provider auth in ~/.cline before scored runs."
+  }
+}

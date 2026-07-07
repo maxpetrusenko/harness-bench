@@ -34,6 +34,20 @@ harness-bench run \
 ```
 - **Expected:** `oracle` runs on both model lanes, `codex × gpt` runs, `codex × sonnet` is skipped with a reason.
 
+### Harness lifecycle readiness
+- **Command:** `harness-bench doctor --harnesses cursor-agent,droid,cline`
+- **Metric/artifact:** installed/missing status, binary path, version, install command, uninstall command
+- **Expected:** installed harnesses show `OK`; missing harnesses show `MISSING` with a documented install path. Scored runs never auto-install global CLIs.
+
+### Cursor subscription model flag
+- **Discovery:** `cursor-agent --list-models`
+- **CLI flag:** `cursor-agent --model <exact-slug> -p --output-format json ...`
+- **SDK proof:**
+```bash
+node -e "import('./src/sdk.mjs').then(async m => { const r = await m.runHarnessBench({harnesses:['cursor-agent'], models:['cursor-gpt55'], tasks:['01-create-file'], timeout:180, outDir:'runs/cursor-sdk-gpt55'}); console.log(r.results[0].model_id, r.results[0].pass, r.reportPath); })"
+```
+- **Expected:** `model_id` is `gpt-5.5-high`, proving SDK model selection passes through to Cursor.
+
 ### Outcome / quality
 - **Tasks:** 01–04 (L0–L1), 08 (L3), 10 (L5), qa-01
 - **Metric:** `pass`, `partial_credit`, category `outcome`, `quality`

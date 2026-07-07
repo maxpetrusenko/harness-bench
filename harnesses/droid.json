@@ -4,5 +4,11 @@
   "parse": "droid-json",
   "cwdMode": "workspace",
   "command": ["droid", "exec", "-o", "json", "--auto", "medium", "--cwd", "{workspace}", "{prompt}"],
-  "modelArgs": ["-m", "{model}"]
+  "modelArgs": ["-m", "{model}"],
+  "lifecycle": {
+    "version": ["droid", "--version"],
+    "install": ["curl -fsSL https://app.factory.ai/cli | sh", "or npm install -g droid"],
+    "uninstall": ["npm uninstall -g droid if installed with npm", "remove ~/.local/bin/droid if installed by Factory script"],
+    "notes": "Factory Droid CLI. Requires FACTORY_API_KEY or browser login before scored runs."
+  }
 }

@@ -4,5 +4,11 @@
   "parse": "opencode-jsonl",
   "cwdMode": "workspace",
   "command": ["opencode", "run", "--format", "json", "{prompt}"],
-  "modelArgs": ["-m", "{model}"]
+  "modelArgs": ["-m", "{model}"],
+  "lifecycle": {
+    "version": ["opencode", "--version"],
+    "install": ["Install OpenCode from official opencode docs"],
+    "uninstall": ["remove the opencode CLI using the same package manager used for install"],
+    "notes": "OpenRouter/provider credentials must be configured before scored runs."
+  }
 }

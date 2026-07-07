@@ -4,5 +4,11 @@
   "parse": "cursor-json",
   "cwdMode": "workspace",
   "command": ["cursor-agent", "-p", "--output-format", "json", "--force", "--trust", "{prompt}"],
-  "modelArgs": ["--model", "{model}"]
+  "modelArgs": ["--model", "{model}"],
+  "lifecycle": {
+    "version": ["cursor-agent", "--version"],
+    "install": ["Install Cursor CLI from https://cursor.com/docs/cli/overview"],
+    "uninstall": ["cursor-agent logout", "remove the Cursor CLI binary if installed standalone"],
+    "notes": "Use cursor-agent --list-models to discover subscription model slugs. Prefer exact slugs over bracket parameter syntax."
+  }
 }

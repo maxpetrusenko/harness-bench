@@ -5,7 +5,8 @@
   "description": "Best-effort same GPT-family lane across CLIs. Exact vendor ids are recorded per run.",
   "harnesses": {
     "codex": "gpt-5.3-codex",
-    "cursor-agent": "gpt-5",
+    "cursor-agent": "gpt-5.5-high",
+    "droid": "gpt-5.2",
     "opencode": "openai/gpt-5"
   }
 }

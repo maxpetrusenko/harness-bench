@@ -4,5 +4,11 @@
   "parse": "claude-json",
   "cwdMode": "workspace",
   "command": ["claude", "-p", "--output-format", "json", "--dangerously-skip-permissions", "--no-session-persistence", "{prompt}"],
-  "modelArgs": ["--model", "{model}"]
+  "modelArgs": ["--model", "{model}"],
+  "lifecycle": {
+    "version": ["claude", "--version"],
+    "install": ["Install Claude Code from Anthropic docs"],
+    "uninstall": ["remove the Claude Code CLI using the same package manager used for install"],
+    "notes": "Requires local Claude Code authentication before scored runs."
+  }
 }

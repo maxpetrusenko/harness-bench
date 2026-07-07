@@ -4,5 +4,11 @@
   "parse": "codex-jsonl",
   "cwdMode": "workspace",
   "command": ["codex", "exec", "--json", "--full-auto", "--skip-git-repo-check", "--ephemeral", "-C", "{workspace}", "{prompt}"],
-  "modelArgs": ["-m", "{model}"]
+  "modelArgs": ["-m", "{model}"],
+  "lifecycle": {
+    "version": ["codex", "--version"],
+    "install": ["Install OpenAI Codex CLI from official OpenAI docs"],
+    "uninstall": ["remove the Codex CLI using the same package manager used for install"],
+    "notes": "Model availability depends on Codex account type; setup errors are scored separately."
+  }
 }
