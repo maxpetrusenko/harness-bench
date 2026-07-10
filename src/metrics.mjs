@@ -20,26 +20,73 @@ const parseJsonLines = (stdout) =>
 
 export { safeParse, parseJsonLines };
 
-export const extractMetrics = (stdout, parseHint) => {
-  const metrics = { costUsd: null, tokensIn: null, tokensOut: null };
-  const objects = [];
+const asNumber = (value) => {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value.replace(/^\$/, ""));
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return null;
+};
 
+const walkObjects = (value, seen = new Set()) => {
+  if (!value || typeof value !== "object" || seen.has(value)) return [];
+  seen.add(value);
+  const objects = [value];
+  for (const child of Object.values(value)) {
+    if (child && typeof child === "object") objects.push(...walkObjects(child, seen));
+  }
+  return objects;
+};
+
+const collectObjects = (stdout) => {
+  const objects = [];
   const whole = safeParse(stdout.trim());
   if (whole) objects.push(whole);
-  objects.push(...parseJsonLines(stdout));
+  else objects.push(...parseJsonLines(stdout));
+  return objects.flatMap((obj) => walkObjects(obj));
+};
+
+const firstNumber = (obj, keys) => {
+  for (const key of keys) {
+    const value = asNumber(obj[key]);
+    if (value !== null) return value;
+  }
+  return null;
+};
+
+export const extractMetrics = (stdout, parseHint) => {
+  const metrics = { costUsd: null, tokensIn: null, tokensOut: null };
+  const objects = collectObjects(stdout);
 
   for (const obj of objects) {
-    const usage = obj.usage ?? obj.info?.tokens ?? obj.msg?.info?.total_token_usage ?? null;
-    const cost =
-      obj.total_cost_usd ?? obj.cost_usd ?? obj.total_cost ?? obj.stats?.cost ?? obj.info?.cost ?? null;
-    if (typeof cost === "number") metrics.costUsd = cost;
-    if (usage) {
-      const tokensIn = usage.input_tokens ?? usage.input ?? usage.prompt_tokens ?? usage.promptTokenCount ?? null;
-      const tokensOut =
-        usage.output_tokens ?? usage.output ?? usage.completion_tokens ?? usage.candidatesTokenCount ?? null;
-      if (typeof tokensIn === "number") metrics.tokensIn = tokensIn;
-      if (typeof tokensOut === "number") metrics.tokensOut = tokensOut;
-    }
+    const cost = firstNumber(obj, [
+      "total_cost_usd",
+      "cost_usd",
+      "total_cost",
+      "cost",
+      "usd",
+      "estimated_cost_usd",
+    ]);
+    if (cost !== null) metrics.costUsd = cost;
+
+    const tokensIn = firstNumber(obj, [
+      "input_tokens",
+      "input",
+      "prompt_tokens",
+      "promptTokenCount",
+      "cache_read_input_tokens",
+      "cached_input_tokens",
+    ]);
+    const tokensOut = firstNumber(obj, [
+      "output_tokens",
+      "output",
+      "completion_tokens",
+      "candidatesTokenCount",
+      "response_tokens",
+    ]);
+    if (tokensIn !== null) metrics.tokensIn = (metrics.tokensIn ?? 0) + tokensIn;
+    if (tokensOut !== null) metrics.tokensOut = (metrics.tokensOut ?? 0) + tokensOut;
   }
   return metrics;
 };

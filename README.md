@@ -1,6 +1,6 @@
 # harness-bench
 
-Measure **agent harnesses**, not models.
+Benchsmarts prototype for measuring **agent harnesses**, not models.
 
 Same tasks + same model + same budget → compare **Claude Code**, **Cursor agent**, **Codex CLI**, **Droid**, **OpenCode** (OpenRouter), **Gemini CLI**, and your own harness.
 
@@ -18,7 +18,7 @@ Codex presearch lives in `docs/`:
 
 ## Completion status
 
-`harness-bench` v1.3.0 is complete as a local scientific harness-benchmark prototype:
+`harness-bench` v1.4.0 is complete as a local scientific harness-benchmark prototype:
 
 - deterministic task verifiers
 - toy calibration harnesses
@@ -33,6 +33,8 @@ Codex presearch lives in `docs/`:
 - category scores
 - setup/runtime error classification
 - harness install/uninstall lifecycle doctor
+- Inspect AI-style result export
+- GitHub CI workflow
 - paired pass-delta stats
 - versioned manifests and history
 
@@ -269,6 +271,18 @@ node bin/harness-bench.mjs import --from swe-bench --source /path/to/swe-bench/d
 
 Imported task shells intentionally require `verify.sh.local` before they can pass; this prevents accidental unverified leaderboard claims.
 
+Every import writes `import-manifest.json` with `status: shells_only` so imported datasets cannot be mistaken for verified benchmark coverage.
+
+## External exports
+
+Export any run into JSONL samples that Inspect AI or downstream eval tooling can ingest:
+
+```bash
+node bin/harness-bench.mjs export --to inspect-ai --run runs/smoke
+```
+
+This is a results export, not a replacement for Inspect AI task definitions.
+
 ## Metrics
 
 **Primary (deterministic):**
@@ -314,9 +328,17 @@ Codex's presearch is solid. Key takeaways already baked in:
 | SWE-bench adapter | ✅ import shell |
 | SDK mode | ✅ `runHarnessBench()` |
 | Paired stats | ✅ `paired-stats.csv` |
-| Inspect AI integration | optional future substrate |
+| Inspect AI integration | ✅ result export, task substrate still optional future |
 | Failure fingerprints | ✅ failures.md |
 | Setup/runtime errors separated from task failures | ✅ `setup_error_rate` + setup buckets |
+
+## GitHub status
+
+This repo is GitHub-ready but publishing requires selecting owner and visibility. See `docs/GITHUB.md`.
+
+```bash
+gh repo create maxpetrusenko/harness-bench --private --source . --remote origin --push
+```
 
 **Not the same thing:** Fable (planning agent in Cursor) vs Claude Code vs Cursor agent — Fable is a *worker*, these harness configs are *runtimes*. To compare Fable you'd add a harness adapter that invokes Fable with the same task prompt.
 

@@ -1,13 +1,28 @@
 import { safeParse, parseJsonLines } from "./metrics.mjs";
 
+const walkObjects = (value, seen = new Set()) => {
+  if (!value || typeof value !== "object" || seen.has(value)) return [];
+  seen.add(value);
+  const objects = [value];
+  for (const child of Object.values(value)) {
+    if (child && typeof child === "object") objects.push(...walkObjects(child, seen));
+  }
+  return objects;
+};
+
 const isToolEvent = (obj) => {
   const type = obj.type ?? obj.event ?? obj.kind ?? "";
   const name = type.toLowerCase();
   return (
     name.includes("tool") ||
+    name.includes("function_call") ||
+    name.includes("exec_command") ||
+    name.includes("shell_call") ||
+    obj.call?.tool_name !== undefined ||
     obj.tool !== undefined ||
     obj.tool_name !== undefined ||
-    obj.function?.name !== undefined
+    obj.function?.name !== undefined ||
+    obj.name === "exec_command"
   );
 };
 
@@ -22,13 +37,21 @@ export const parseEvents = (stdout, parseHint) => {
   const objects = [];
   const whole = safeParse(stdout.trim());
   if (whole) objects.push(whole);
-  objects.push(...parseJsonLines(stdout));
+  else objects.push(...parseJsonLines(stdout));
 
-  for (const obj of objects) {
+  for (const obj of objects.flatMap((entry) => walkObjects(entry))) {
     if (isToolEvent(obj)) {
       events.push({
         kind: "tool",
-        name: obj.tool ?? obj.tool_name ?? obj.function?.name ?? obj.name ?? "unknown",
+        name:
+          obj.tool ??
+          obj.tool_name ??
+          obj.call?.tool_name ??
+          obj.function?.name ??
+          obj.item?.name ??
+          obj.item?.type ??
+          obj.name ??
+          "unknown",
         status: isToolError(obj) ? "error" : "ok",
       });
     }

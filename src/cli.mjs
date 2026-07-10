@@ -3,6 +3,7 @@ import { runMatrix } from "./runner.mjs";
 import { writeReport } from "./report.mjs";
 import { runCalibration } from "./calibrate.mjs";
 import { importTasks } from "./importers.mjs";
+import { writeInspectExport } from "./inspect-export.mjs";
 import { loadRunHistory, BENCH_VERSION } from "./versions.mjs";
 import { inspectHarnessLifecycle, formatLifecycleReport } from "./lifecycle.mjs";
 import path from "node:path";
@@ -19,6 +20,7 @@ Usage:
   harness-bench list                List harnesses, tasks, suites
   harness-bench doctor              Check harness CLI install/lifecycle status
   harness-bench import [options]    Import Terminal-Bench/SWE-bench task shells
+  harness-bench export [options]    Export a run for external eval tooling
   harness-bench history             Show recent runs (runs/history.jsonl)
   harness-bench report <runDir>     Rebuild report from results.jsonl
 
@@ -42,6 +44,11 @@ Import options:
   --from <source>          terminal-bench | swe-bench
   --source <dir>           Source checkout or dataset directory
   --name <id>              Output task group suffix
+
+Export options:
+  --to inspect-ai          Write Inspect AI-style JSONL samples
+  --run <dir>              Run directory containing results.jsonl
+  --out <file>             Output file
 
 Examples:
   harness-bench calibrate
@@ -142,6 +149,13 @@ const importCommand = (options) => {
   });
   console.log(`Imported ${result.imported} task shells to ${result.outDir}`);
   console.log("Add task fixtures and verify.sh.local files before using them in scored runs.");
+};
+
+const exportCommand = (options) => {
+  if (options.to !== "inspect-ai") throw new Error("Usage: harness-bench export --to inspect-ai --run <runDir> [--out <file>]");
+  if (!options.run) throw new Error("Usage: harness-bench export --to inspect-ai --run <runDir> [--out <file>]");
+  const result = writeInspectExport({ runDir: options.run, outFile: options.out ?? null });
+  console.log(`Exported ${result.samples} samples to ${result.outFile}`);
 };
 
 const buildRunConfig = (options) => {
@@ -256,6 +270,7 @@ export const main = async (argv) => {
   if (command === "list") return listCommand();
   if (command === "doctor") return doctorCommand(options);
   if (command === "import") return importCommand(options);
+  if (command === "export") return exportCommand(options);
   if (command === "history") return historyCommand();
   if (command === "calibrate") return runCalibration(ROOT);
   if (command === "run") return runCommand(options);

@@ -110,6 +110,21 @@ export const importTasks = ({ root, sourceType, sourceDir, outName = sourceType 
     throw new Error(`Unsupported import source: ${sourceType}`);
   }
 
+  fs.writeFileSync(
+    path.join(outDir, "import-manifest.json"),
+    JSON.stringify(
+      {
+        source_type: sourceType,
+        source_dir: resolved,
+        imported_at: new Date().toISOString(),
+        imported_tasks: imported.length,
+        status: "shells_only",
+        required_next_step: "Add fixtures and verify.sh.local for each imported task before scored use.",
+      },
+      null,
+      2
+    )
+  );
+
   return { outDir, imported: imported.length };
 };
-

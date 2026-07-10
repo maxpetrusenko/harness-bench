@@ -1,6 +1,6 @@
 {
   "name": "harness-bench",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Measure agent harnesses (not models): run the same tasks with the same model through claude, cursor-agent, codex, droid, opencode, gemini and compare pass rate, speed, cost, honesty.",
   "type": "module",
   "bin": {
