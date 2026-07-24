@@ -17,6 +17,29 @@ test("detects auth failures as setup errors", () => {
   assert.equal(error.kind, "auth_error");
 });
 
+test("detects JSON auth failures as setup errors", () => {
+  const error = detectSetupError({
+    harness: { id: "droid", kind: "cli" },
+    stdout:
+      '{"type":"result","subtype":"failure","is_error":true,"result":"Authentication failed. Please log into Factory or set a valid FACTORY_API_KEY environment variable."}',
+    stderr: "",
+    exitCode: 1,
+  });
+
+  assert.equal(error.kind, "auth_error");
+});
+
+test("detects account tier failures as setup errors", () => {
+  const error = detectSetupError({
+    harness: { id: "gemini", kind: "cli" },
+    stdout: "",
+    stderr: "IneligibleTierError: This client is no longer supported for Gemini Code Assist for individuals.",
+    exitCode: 1,
+  });
+
+  assert.equal(error.kind, "account_tier");
+});
+
 test("detects model rejection as setup error", () => {
   const error = detectSetupError({
     harness: cliHarness,

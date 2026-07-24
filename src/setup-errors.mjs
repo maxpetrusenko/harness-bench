@@ -1,5 +1,6 @@
 const SETUP_ERROR_RULES = [
-  ["auth_error", /failed to authenticate|authentication_error|invalid authentication credentials|api error:\s*401/i],
+  ["auth_error", /failed to authenticate|authentication failed|error authenticating|authentication_error|invalid authentication credentials|api error:\s*401/i],
+  ["account_tier", /ineligibletiererror|unsupported_client|client is no longer supported|ineligible tier/i],
   ["model_unavailable", /cannot use this model|model is not supported|unsupported model|unknown model/i],
   ["usage_limit", /usage limit|spend limit|monthly cycle|quota exceeded|rate limit/i],
   ["spawn_error", /spawn error|enoent|command not found/i],
