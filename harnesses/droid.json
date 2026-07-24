@@ -5,6 +5,18 @@
   "cwdMode": "workspace",
   "command": ["droid", "exec", "-o", "json", "--auto", "medium", "--cwd", "{workspace}", "{prompt}"],
   "modelArgs": ["-m", "{model}"],
+  "modelArgsIndex": 2,
+  "capabilities": {
+    "edits_files": true,
+    "runs_shell": true,
+    "reads_images": true,
+    "mcp": false,
+    "browser": false,
+    "lsp": false,
+    "git_native": false,
+    "headless": true,
+    "supports_model_flag": true
+  },
   "lifecycle": {
     "version": ["droid", "--version"],
     "install": ["curl -fsSL https://app.factory.ai/cli | sh", "or npm install -g droid"],

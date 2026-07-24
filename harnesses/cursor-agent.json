@@ -5,6 +5,17 @@
   "cwdMode": "workspace",
   "command": ["cursor-agent", "-p", "--output-format", "json", "--force", "--trust", "{prompt}"],
   "modelArgs": ["--model", "{model}"],
+  "capabilities": {
+    "edits_files": true,
+    "runs_shell": true,
+    "reads_images": true,
+    "mcp": true,
+    "browser": false,
+    "lsp": true,
+    "git_native": true,
+    "headless": true,
+    "supports_model_flag": true
+  },
   "lifecycle": {
     "version": ["cursor-agent", "--version"],
     "install": ["Install Cursor CLI from https://cursor.com/docs/cli/overview"],

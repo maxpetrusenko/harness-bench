@@ -1,0 +1,25 @@
+{
+  "id": "aider",
+  "kind": "cli",
+  "parse": "text",
+  "cwdMode": "workspace",
+  "command": ["aider", "--yes-always", "--no-auto-commits", "--message", "{prompt}"],
+  "modelArgs": ["--model", "{model}"],
+  "capabilities": {
+    "edits_files": true,
+    "runs_shell": true,
+    "reads_images": true,
+    "mcp": false,
+    "browser": false,
+    "lsp": false,
+    "git_native": true,
+    "headless": true,
+    "supports_model_flag": true
+  },
+  "lifecycle": {
+    "version": ["aider", "--version"],
+    "install": ["python -m pip install aider-chat", "or uv tool install aider-chat"],
+    "uninstall": ["python -m pip uninstall aider-chat", "or uv tool uninstall aider-chat"],
+    "notes": "Terminal pair-programming agent. Use --message for one-shot benchmark cells."
+  }
+}

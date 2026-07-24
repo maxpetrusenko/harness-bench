@@ -1,0 +1,25 @@
+{
+  "id": "copilot-cli",
+  "kind": "cli",
+  "parse": "text",
+  "cwdMode": "workspace",
+  "command": ["copilot", "-p", "{prompt}", "--allow-all-tools"],
+  "modelArgs": ["--model", "{model}"],
+  "capabilities": {
+    "edits_files": true,
+    "runs_shell": true,
+    "reads_images": true,
+    "mcp": true,
+    "browser": false,
+    "lsp": true,
+    "git_native": true,
+    "headless": true,
+    "supports_model_flag": true
+  },
+  "lifecycle": {
+    "version": ["copilot", "--version"],
+    "install": ["Install GitHub Copilot CLI from GitHub Docs"],
+    "uninstall": ["remove the Copilot CLI using the same package manager used for install"],
+    "notes": "GitHub-native CLI. --allow-all-tools is only for isolated benchmark workspaces."
+  }
+}

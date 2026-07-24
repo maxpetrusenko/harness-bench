@@ -1,0 +1,9 @@
+{
+  "id": "qwen",
+  "label": "Qwen lane",
+  "provider": "qwen",
+  "description": "Qwen-family lane for Qwen Code harness runs. Exact provider id is recorded per run.",
+  "harnesses": {
+    "qwen-code": "qwen3-coder-plus"
+  }
+}

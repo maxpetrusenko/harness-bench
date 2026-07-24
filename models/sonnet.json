@@ -4,9 +4,16 @@
   "provider": "anthropic",
   "description": "Best-effort same Sonnet-family lane across CLIs. Exact vendor ids are recorded per run.",
   "harnesses": {
+    "aider": "sonnet",
     "claude": "sonnet",
+    "continue": "anthropic/claude-sonnet-4-5",
+    "copilot-cli": "claude-sonnet-4.5",
+    "crush": "anthropic/claude-sonnet-4-5",
     "cursor-agent": "claude-sonnet-5-thinking-high",
     "droid": "claude-sonnet-4-5-20250929",
+    "goose": "claude-sonnet-4-5",
+    "kilo": "anthropic/claude-sonnet-4-5",
+    "openhands": "anthropic/claude-sonnet-4-5",
     "opencode": "anthropic/claude-sonnet-4-5"
   }
 }

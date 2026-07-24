@@ -94,7 +94,11 @@ const listCommand = () => {
   console.log("\nHarnesses:");
   for (const harness of harnesses) {
     const kind = harness.kind === "cli" ? `cli: ${harness.command[0]}` : `toy (${harness.behavior})`;
-    console.log(`  ${harness.id.padEnd(14)} ${kind}`);
+    const tags = Object.entries(harness.capabilities ?? {})
+      .filter(([, enabled]) => enabled)
+      .map(([name]) => name.replace(/_/g, "-"))
+      .join(", ");
+    console.log(`  ${harness.id.padEnd(14)} ${kind}${tags ? ` [${tags}]` : ""}`);
   }
   console.log("\nModels:");
   for (const model of models) {

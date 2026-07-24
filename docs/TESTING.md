@@ -77,8 +77,13 @@ node -e "import('./src/sdk.mjs').then(async m => { const r = await m.runHarnessB
 
 ### Learning / retest
 - **Tasks:** 03, 05, 10 with `--retest`
-- **Metric:** `retest_gain`, `retest_improved`, category `learning`
+- **Metric:** `retest_gain`, `retest_improved`, `learning.csv`, category `learning`
 - **Test:** `harness-bench run --suite hard --retest --tasks 10-transfer-summary`
+- **Views:**
+  - `harness_model`: Did a specific harness improve on the same model after `PRIOR_RUN.md`?
+  - `harness`: Did a harness improve across model lanes?
+  - `model`: Did a model lane improve across harnesses?
+- **Learning-rate fields:** `fail_to_pass_rate`, `wall_improvement_rate`, `any_improvement_rate`
 
 ### Context management
 - **Tasks:** 09-stale-trap with `--context loaded50k`, `loaded100k`, or `conflict_context`
@@ -170,6 +175,27 @@ Every report with at least two harnesses writes `paired-stats.csv`:
 - `pass_delta_b_minus_a`
 - approximate `ci95_low` / `ci95_high`
 - paired wins/losses/ties on matched task/repeat/phase cells
+
+## Daily radar / autoreview flow
+
+```bash
+npm run daily:radar
+```
+
+The daily radar is read-only and does not install harnesses or run paid model cells. It reports:
+
+- harness inventory
+- model-lane coverage per harness
+- capability gaps for image, MCP, browser, and LSP support
+- one suggested next PR
+
+GitHub runs the same radar daily. Hermes can consume the output, open or update a PR, then require autoreview skills before approval:
+
+```text
+agent-learning-loop, gstack-autoplan, gstack-review, github-code-review
+```
+
+Approval gate remains deterministic: `npm test`, `npm run sdk:smoke`, and `npm run smoke`.
 
 ---
 

@@ -41,6 +41,16 @@ test("extracts nested JSON setup messages", () => {
   assert.equal(error.message, "The gpt model is not supported here");
 });
 
+test("detects CLI usage and unknown-flag errors as setup errors", () => {
+  const error = detectSetupError({
+    harness: { id: "bad-agent", kind: "cli" },
+    stderr: "error: unknown option '--trust-me'",
+    exitCode: 2,
+  });
+
+  assert.equal(error.kind, "cli_usage_error");
+});
+
 test("does not classify normal verifier failure as setup error", () => {
   const error = detectSetupError({
     harness: cliHarness,

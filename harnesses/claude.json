@@ -5,6 +5,17 @@
   "cwdMode": "workspace",
   "command": ["claude", "-p", "--output-format", "json", "--dangerously-skip-permissions", "--no-session-persistence", "{prompt}"],
   "modelArgs": ["--model", "{model}"],
+  "capabilities": {
+    "edits_files": true,
+    "runs_shell": true,
+    "reads_images": true,
+    "mcp": true,
+    "browser": false,
+    "lsp": false,
+    "git_native": false,
+    "headless": true,
+    "supports_model_flag": true
+  },
   "lifecycle": {
     "version": ["claude", "--version"],
     "install": ["Install Claude Code from Anthropic docs"],

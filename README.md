@@ -15,10 +15,11 @@ Public leaderboards mostly swap models. This tool holds the model constant and v
 Codex presearch lives in `docs/`:
 - `docs/harness-meter-brainlift-presearch.md` — landscape, MVP slices, CLI shape
 - `docs/harness-bench-scientific-protocol.md` — image, skills, retest, honesty, context conditions
+- `docs/HARNESS-ADAPTERS.md` — researched CLI adapter notes and source links
 
 ## Completion status
 
-`harness-bench` v1.4.0 is complete as a local scientific harness-benchmark prototype:
+`harness-bench` v1.5.0 is complete as a local scientific harness-benchmark prototype:
 
 - deterministic task verifiers
 - toy calibration harnesses
@@ -36,6 +37,8 @@ Codex presearch lives in `docs/`:
 - Inspect AI-style result export
 - GitHub CI workflow
 - paired pass-delta stats
+- harness and model learning-rate exports
+- daily radar workflow for reviewable improvement PRs
 - versioned manifests and history
 
 ## Quick start
@@ -70,13 +73,15 @@ node bin/harness-bench.mjs doctor
 
 Current model lanes:
 
-| Canonical | claude | cursor-agent | codex | droid | opencode (OpenRouter) |
-|-----------|--------|--------------|-------|-------|------------------------|
-| `sonnet`  | sonnet | claude-sonnet-5-thinking-high | — | claude-sonnet-4-5-20250929 | anthropic/claude-sonnet-4-5 |
-| `gpt`     | —      | gpt-5.5-high | gpt-5.3-codex | gpt-5.2 | openai/gpt-5 |
-| `opus`    | opus   | claude-opus-4-8-thinking-high | — | claude-opus-4-5-20251101 | — |
-| `cursor-gpt55` | — | gpt-5.5-high | — | — | — |
-| `cursor-composer` | — | composer-2.5 | — | — | — |
+| Canonical | Mapped harnesses |
+|-----------|------------------|
+| `sonnet` | aider, claude, continue, copilot-cli, crush, cursor-agent, droid, goose, kilo, openhands, opencode |
+| `gpt` | aider, codex, continue, copilot-cli, crush, cursor-agent, droid, goose, kilo, openhands, opencode |
+| `opus` | claude, cursor-agent, droid |
+| `qwen` | qwen-code |
+| `gemini` | gemini |
+| `cursor-gpt55` | cursor-agent |
+| `cursor-composer` | cursor-agent |
 
 If a harness has no mapping for a requested model, that harness/model pair is skipped before execution and written to `skipped-model-harnesses.csv`.
 
@@ -139,6 +144,12 @@ node bin/harness-bench.mjs run \
   --out runs/retest-learning
 ```
 
+The retest run writes `learning.csv` with three views:
+
+- `harness_model`: learning rate for one harness on one model lane
+- `harness`: learning rate aggregated across model lanes
+- `model`: learning rate aggregated across harnesses
+
 ## Output
 
 Each run writes:
@@ -148,6 +159,7 @@ runs/<name>/
   manifest.json      # frozen config
   results.jsonl      # one JSON object per cell
   scores.csv         # aggregated by harness × model
+  learning.csv       # retest learning rates by harness_model, harness, and model
   skipped-model-harnesses.csv
                     # requested pairs with no model mapping
   paired-stats.csv   # paired harness deltas on matched cells
@@ -162,6 +174,7 @@ runs/<name>/
 - **Wall seconds per solved task**
 - **Cost per solved task** (when CLI reports usage)
 - **Scorecard** — timeouts, overclaims, honest failures, retest gain
+- **Learning rate** — fail-to-pass, speed improvement, and any-improvement rates from Round A to B
 - **Per-task grid** — green/red dots per harness × model × task
 
 ## Tasks (13)
@@ -190,12 +203,20 @@ node bin/harness-bench.mjs list
 
 | Id | Type | CLI |
 |----|------|-----|
+| aider | real | `aider --message` |
 | claude | real | `claude -p --output-format json` |
+| continue | real | `cn -p` |
+| copilot-cli | real | `copilot -p` |
+| crush | real | `crush run` |
 | cursor-agent | real | `cursor-agent -p --output-format json` |
 | codex | real | `codex exec --json` |
 | droid | real | `droid exec -o json` |
-| opencode | real | `opencode run` (OpenRouter model ids) |
 | gemini | real | `gemini -o json` |
+| goose | real | `goose run --output-format json` |
+| kilo | real | `kilo run --format json` |
+| openhands | real | `openhands --headless` |
+| opencode | real | `opencode run` (OpenRouter model ids) |
+| qwen-code | real | `qwen -p` |
 | oracle / noop / overclaim | toy | pipeline smoke only |
 
 Add your harness: drop `harnesses/my-harness.json` following the schema in `harnesses/claude.json`.
@@ -212,6 +233,14 @@ Add a model lane: drop `models/my-model.json`:
   }
 }
 ```
+
+## Daily improvement loop
+
+```bash
+npm run daily:radar
+```
+
+The radar is read-only. It checks adapter inventory, model-lane coverage, capability gaps, and proposes the next PR. GitHub runs it daily in `.github/workflows/daily-radar.yml`; Hermes can use the same command with autoreview skills before approving or merging any agent-authored PR.
 
 ## CLI reference
 

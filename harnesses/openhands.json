@@ -1,0 +1,25 @@
+{
+  "id": "openhands",
+  "kind": "cli",
+  "parse": "text",
+  "cwdMode": "workspace",
+  "command": ["openhands", "--headless", "-t", "{prompt}"],
+  "modelArgs": ["--model", "{model}"],
+  "capabilities": {
+    "edits_files": true,
+    "runs_shell": true,
+    "reads_images": true,
+    "mcp": true,
+    "browser": true,
+    "lsp": false,
+    "git_native": true,
+    "headless": true,
+    "supports_model_flag": true
+  },
+  "lifecycle": {
+    "version": ["openhands", "--version"],
+    "install": ["uv tool install openhands --python 3.12"],
+    "uninstall": ["uv tool uninstall openhands"],
+    "notes": "Heavier autonomous agent runtime. Use longer timeouts and isolated workspaces."
+  }
+}

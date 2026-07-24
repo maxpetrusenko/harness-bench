@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { aggregateCategories, aggregateByHardness } from "./categories.mjs";
+import { learningStats } from "./learning.mjs";
 import { pairedStats } from "./stats.mjs";
 import { BENCH_VERSION } from "./versions.mjs";
 
@@ -103,10 +104,12 @@ export const writeReport = (outDir, results, config) => {
   const categoryRows = aggregateCategories(results);
   const hardnessGrid = aggregateByHardness(results);
   const pairedRows = pairedStats(results);
+  const learningRows = learningStats(results);
   const skippedRows = config.skippedModelHarnesses ?? config.skipped_model_harnesses ?? [];
   fs.writeFileSync(path.join(outDir, "scores.csv"), toCsv(rows));
   if (categoryRows.length) fs.writeFileSync(path.join(outDir, "categories.csv"), toCsv(categoryRows));
   if (pairedRows.length) fs.writeFileSync(path.join(outDir, "paired-stats.csv"), toCsv(pairedRows));
+  if (learningRows.length) fs.writeFileSync(path.join(outDir, "learning.csv"), toCsv(learningRows));
   if (skippedRows.length) fs.writeFileSync(path.join(outDir, "skipped-model-harnesses.csv"), toCsv(skippedRows));
   fs.writeFileSync(path.join(outDir, "failures.md"), buildFailuresMd(results));
   fs.writeFileSync(path.join(outDir, "hardness.json"), JSON.stringify(hardnessGrid, null, 2));
@@ -132,6 +135,7 @@ export const writeReport = (outDir, results, config) => {
     rows,
     categoryRows,
     pairedRows,
+    learningRows,
     hardnessGrid,
     results: results.map((r) => ({
       harness: r.harness,
@@ -215,6 +219,9 @@ const buildHtml = (data) => `<!doctype html>
 
   <h2>Paired pass deltas</h2>
   <div class="panel" style="overflow-x:auto"><table id="paired"></table></div>
+
+  <h2>Learning rate (Round A to B)</h2>
+  <div class="panel" style="overflow-x:auto"><table id="learning"></table></div>
 
   <h2>Pass rate by hardness</h2>
   <div class="panel" style="overflow-x:auto"><table id="hardness"></table></div>
@@ -399,6 +406,32 @@ for (const row of (DATA.pairedRows || [])) {
     tr.append(td);
   }
   paired.append(tr);
+}
+
+// ---- learning table ----
+const learning = document.getElementById("learning");
+const learningCols = [
+  ["kind","Kind"],["harness","Harness"],["model","Model"],["matched_pairs","Pairs"],
+  ["pass_rate_a","A pass"],["pass_rate_b","B pass"],["pass_gain","Pass gain"],
+  ["fail_to_pass_rate","Fail to pass"],["wall_improvement_rate","Faster"],["any_improvement_rate","Any gain"],
+];
+const learningHead = el("tr");
+for (const [, label] of learningCols) { const th = el("th"); th.textContent = label; learningHead.append(th); }
+learning.append(learningHead);
+for (const row of (DATA.learningRows || [])) {
+  const tr = el("tr");
+  for (const [key] of learningCols) {
+    const td = el("td");
+    const v = row[key];
+    if (typeof v === "number" && key !== "matched_pairs") {
+      td.textContent = (v > 0 && key.includes("gain") ? "+" : "") + Math.round(v * 100) + "%";
+      if (v > 0 && ["pass_gain", "fail_to_pass_rate", "any_improvement_rate"].includes(key)) td.className = "pass";
+    } else {
+      td.textContent = String(v || "—");
+    }
+    tr.append(td);
+  }
+  learning.append(tr);
 }
 
 // ---- hardness grid ----

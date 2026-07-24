@@ -5,6 +5,17 @@
   "cwdMode": "workspace",
   "command": ["codex", "exec", "--json", "--full-auto", "--skip-git-repo-check", "--ephemeral", "-C", "{workspace}", "{prompt}"],
   "modelArgs": ["-m", "{model}"],
+  "capabilities": {
+    "edits_files": true,
+    "runs_shell": true,
+    "reads_images": false,
+    "mcp": false,
+    "browser": false,
+    "lsp": false,
+    "git_native": false,
+    "headless": true,
+    "supports_model_flag": true
+  },
   "lifecycle": {
     "version": ["codex", "--version"],
     "install": ["Install OpenAI Codex CLI from official OpenAI docs"],

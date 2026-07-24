@@ -1,0 +1,25 @@
+name: daily-radar
+
+on:
+  schedule:
+    - cron: "20 14 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm test
+      - run: npm run daily:radar -- --out runs/daily-radar.md
+      - run: cat runs/daily-radar.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: harness-bench-daily-radar
+          path: runs/daily-radar.md

@@ -14,7 +14,7 @@ const groupBy = (items, keyFn) => {
 };
 
 export const pairedStats = (results) => {
-  const byModel = groupBy(results, (r) => r.model);
+  const byModel = groupBy(results.filter((r) => !r.setup_error), (r) => r.model);
   const rows = [];
 
   for (const [model, modelRuns] of byModel) {
@@ -72,4 +72,3 @@ export const pairedStats = (results) => {
   }
   return rows;
 };
-

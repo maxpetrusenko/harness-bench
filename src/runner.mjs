@@ -140,14 +140,21 @@ const runToyHarness = (harness, task, workspace) => {
   return { stdout, stderr: "", exitCode, wallMs: Date.now() - startedAt, timedOut: false };
 };
 
+export const buildCliArgv = (harness, prompt, modelId, workspace) => {
+  const vars = { prompt, model: modelId ?? "", workspace };
+  let argv = substitute(harness.command, vars);
+  if (modelId && harness.modelArgs) {
+    const modelArgs = substitute(harness.modelArgs, vars);
+    const rawIndex = Number(harness.modelArgsIndex ?? 1);
+    const index = Number.isInteger(rawIndex) ? Math.max(1, Math.min(rawIndex, argv.length)) : 1;
+    argv = [...argv.slice(0, index), ...modelArgs, ...argv.slice(index)];
+  }
+  return argv;
+};
+
 const runCliHarness = (harness, prompt, modelId, workspace, timeoutMs) =>
   new Promise((resolve) => {
-    const vars = { prompt, model: modelId ?? "", workspace };
-    let argv = substitute(harness.command, vars);
-    if (modelId && harness.modelArgs) {
-      // Insert model args right after the executable, before the prompt.
-      argv = [argv[0], ...substitute(harness.modelArgs, vars), ...argv.slice(1)];
-    }
+    const argv = buildCliArgv(harness, prompt, modelId, workspace);
     const [executable, ...args] = argv;
     const startedAt = Date.now();
     const child = spawn(executable, args, {
@@ -235,7 +242,7 @@ const executeCell = async (config, cell, cellIndex, totalCells, priorResult) => 
 
   const retestImproved =
     phase === "B" && priorResult
-      ? (!priorResult.pass && verifier.pass) || (priorResult.pass === verifier.pass && resultWallImproved(priorResult, execution))
+      ? (!priorResult.pass && verifier.pass) || (priorResult.pass && verifier.pass && resultWallImproved(priorResult, execution))
       : null;
 
   const result = {
@@ -353,7 +360,6 @@ export const runMatrix = async (config) => {
 
   const resultsPath = path.join(config.outDir, "results.jsonl");
   const results = [];
-  const priorByKey = new Map();
   const appendResult = (result) => {
     results.push(result);
     fs.appendFileSync(resultsPath, `${JSON.stringify(result)}\n`);
@@ -366,12 +372,10 @@ export const runMatrix = async (config) => {
   for (let seq = 1; seq <= continuous; seq += 1) {
     config.continuousSequence = seq;
     for (const cell of cells) {
-      const keyA = `${cell.harness.id}|||${cell.model.id}|||${cell.task.id}|||${cell.repeat}|||A|||${seq}`;
       const resultA = await executeCell(config, { ...cell, phase: config.retest ? "A" : null }, index, totalCells, null);
       index += 1;
       resultA.continuous_sequence = seq;
       appendResult(resultA);
-      priorByKey.set(keyA, resultA);
 
       if (config.retest) {
         const retestCell = { ...cell, phase: "B", priorRunSummary: buildPriorRunSummary(resultA) };

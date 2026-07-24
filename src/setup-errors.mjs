@@ -3,6 +3,7 @@ const SETUP_ERROR_RULES = [
   ["model_unavailable", /cannot use this model|model is not supported|unsupported model|unknown model/i],
   ["usage_limit", /usage limit|spend limit|monthly cycle|quota exceeded|rate limit/i],
   ["spawn_error", /spawn error|enoent|command not found/i],
+  ["cli_usage_error", /unknown option|unknown argument|unrecognized option|unrecognized argument|invalid option|unexpected argument|usage:/i],
   ["runtime_crash", /unexpected error|typeerror|response\.headers|uncaught exception/i],
 ];
 

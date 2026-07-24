@@ -26,10 +26,12 @@ const commandExists = (command) => {
 };
 
 export const inspectHarnessLifecycle = (harness) => {
+  const capabilities = harness.capabilities ?? {};
   if (harness.kind !== "cli") {
     return {
       id: harness.id,
       kind: harness.kind,
+      capabilities,
       installed: true,
       status: "toy",
       path: null,
@@ -48,6 +50,7 @@ export const inspectHarnessLifecycle = (harness) => {
   return {
     id: harness.id,
     kind: harness.kind,
+    capabilities,
     installed: exists.ok,
     status: exists.ok ? "installed" : "missing",
     path: exists.path,
@@ -58,12 +61,19 @@ export const inspectHarnessLifecycle = (harness) => {
   };
 };
 
+const capabilityTags = (capabilities = {}) =>
+  Object.entries(capabilities)
+    .filter(([, enabled]) => enabled)
+    .map(([name]) => name.replace(/_/g, "-"));
+
 export const formatLifecycleReport = (rows) => {
   const lines = ["Harness lifecycle status:\n"];
   for (const row of rows) {
     lines.push(`${row.installed ? "OK" : "MISSING"}  ${row.id}`);
     if (row.path) lines.push(`  path: ${row.path}`);
     if (row.version) lines.push(`  version: ${row.version}`);
+    const tags = capabilityTags(row.capabilities);
+    if (tags.length) lines.push(`  capabilities: ${tags.join(", ")}`);
     if (!row.installed && row.install.length) lines.push(`  install: ${row.install.join(" && ")}`);
     if (row.uninstall.length) lines.push(`  uninstall: ${row.uninstall.join(" && ")}`);
     if (row.notes) lines.push(`  notes: ${row.notes}`);

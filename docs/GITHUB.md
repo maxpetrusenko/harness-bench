@@ -1,18 +1,8 @@
 # GitHub Publication
 
-Current local repo has no remote. Publish only after choosing owner and visibility.
+Current public repo:
 
-Recommended private repo:
-
-```bash
-gh repo create maxpetrusenko/harness-bench --private --source . --remote origin --push
-```
-
-Recommended public repo after removing any private run artifacts:
-
-```bash
-gh repo create maxpetrusenko/harness-bench --public --source . --remote origin --push
-```
+https://github.com/maxpetrusenko/harness-bench
 
 Pre-push checks:
 
@@ -24,3 +14,5 @@ npm run smoke
 ```
 
 The CI workflow runs tests and smoke checks on GitHub. Real harness runs are intentionally excluded from CI because they require local CLI auth and paid model access.
+
+The daily radar workflow runs read-only inventory checks and publishes the suggested next PR as an artifact. It does not install CLIs or run paid harness matrices.

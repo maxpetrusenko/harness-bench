@@ -1,0 +1,26 @@
+{
+  "id": "goose",
+  "kind": "cli",
+  "parse": "goose-json",
+  "cwdMode": "workspace",
+  "command": ["goose", "run", "--output-format", "json", "--text", "{prompt}"],
+  "modelArgs": ["--model", "{model}"],
+  "modelArgsIndex": 2,
+  "capabilities": {
+    "edits_files": true,
+    "runs_shell": true,
+    "reads_images": false,
+    "mcp": true,
+    "browser": false,
+    "lsp": false,
+    "git_native": false,
+    "headless": true,
+    "supports_model_flag": true
+  },
+  "lifecycle": {
+    "version": ["goose", "--version"],
+    "install": ["Install Goose CLI from https://goose-docs.ai/docs/getting-started/installation/"],
+    "uninstall": ["remove the Goose CLI using the same package manager used for install"],
+    "notes": "Open-source on-machine agent. Requires provider config before scored runs."
+  }
+}

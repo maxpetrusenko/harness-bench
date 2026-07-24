@@ -1,0 +1,26 @@
+{
+  "id": "kilo",
+  "kind": "cli",
+  "parse": "kilo-json",
+  "cwdMode": "workspace",
+  "command": ["kilo", "run", "--format", "json", "--auto", "{prompt}"],
+  "modelArgs": ["--model", "{model}"],
+  "modelArgsIndex": 2,
+  "capabilities": {
+    "edits_files": true,
+    "runs_shell": true,
+    "reads_images": true,
+    "mcp": true,
+    "browser": false,
+    "lsp": true,
+    "git_native": true,
+    "headless": true,
+    "supports_model_flag": true
+  },
+  "lifecycle": {
+    "version": ["kilo", "--version"],
+    "install": ["npm install -g @kilocode/cli"],
+    "uninstall": ["npm uninstall -g @kilocode/cli"],
+    "notes": "Kilo CLI run mode with JSON events. Use provider/model slugs for model lanes."
+  }
+}

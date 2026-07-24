@@ -1,0 +1,26 @@
+{
+  "id": "crush",
+  "kind": "cli",
+  "parse": "text",
+  "cwdMode": "workspace",
+  "command": ["crush", "run", "{prompt}"],
+  "modelArgs": ["--model", "{model}"],
+  "modelArgsIndex": 2,
+  "capabilities": {
+    "edits_files": true,
+    "runs_shell": true,
+    "reads_images": false,
+    "mcp": true,
+    "browser": false,
+    "lsp": true,
+    "git_native": false,
+    "headless": true,
+    "supports_model_flag": true
+  },
+  "lifecycle": {
+    "version": ["crush", "--version"],
+    "install": ["Install Crush from https://github.com/charmbracelet/crush"],
+    "uninstall": ["remove the Crush CLI using the same package manager used for install"],
+    "notes": "Terminal coding agent. Verify local run syntax with doctor before paid matrix use."
+  }
+}

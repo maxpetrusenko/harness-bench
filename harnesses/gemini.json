@@ -5,6 +5,17 @@
   "cwdMode": "workspace",
   "command": ["gemini", "--yolo", "-o", "json", "-p", "{prompt}"],
   "modelArgs": ["-m", "{model}"],
+  "capabilities": {
+    "edits_files": true,
+    "runs_shell": true,
+    "reads_images": true,
+    "mcp": false,
+    "browser": false,
+    "lsp": false,
+    "git_native": false,
+    "headless": true,
+    "supports_model_flag": true
+  },
   "lifecycle": {
     "version": ["gemini", "--version"],
     "install": ["Install Gemini CLI from official Google docs"],

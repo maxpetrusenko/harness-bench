@@ -14,6 +14,11 @@ test("missing cli lifecycle reports install and uninstall commands", () => {
     id: "missing-agent",
     kind: "cli",
     command: ["definitely-not-a-real-harness-bench-command"],
+    capabilities: {
+      edits_files: true,
+      reads_images: true,
+      headless: true,
+    },
     lifecycle: {
       install: ["npm install -g missing-agent"],
       uninstall: ["npm uninstall -g missing-agent"],
@@ -25,6 +30,7 @@ test("missing cli lifecycle reports install and uninstall commands", () => {
   assert.equal(row.status, "missing");
   const report = formatLifecycleReport([row]);
   assert.match(report, /MISSING  missing-agent/);
+  assert.match(report, /capabilities: edits-files, reads-images, headless/);
   assert.match(report, /npm install -g missing-agent/);
   assert.match(report, /npm uninstall -g missing-agent/);
 });
